@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}<title>Document</title>{% endblock %}
+    <style>
+        body {
+            background-color: #41436A;
+        }
+        .button-container {
+            width: 15%;
+            float: left;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+        }
+        .button {
+            width: 100%;
+            height: 16.2%;
+            color: #E5EFC1;
+            background-color: #41436A;
+            border: 4px solid #E5EFC1;
+            margin-bottom: -1%;
+            font-family: Tahoma;
+            font-size: x-large;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #282946;
+        }
+        @media (max-width: 850px) {
+        .button {
+            font-size: medium;
+        }
+    }
+    </style>
+    <div class = "button-container">
+        <button onclick="window.location.href = '/manager-calendar'" class="button" id="calendar-button">Calendar</button>
+        <button onclick="window.location.href = '/manager-bookings'" class="button">Bookings</button>
+        <button onclick="window.location.href = '/manager-invoices'" class="button">Invoices</button>
+        <button onclick="window.location.href = '/manager-customers'" class="button">Customers</button>
+        <button onclick="window.location.href = '/manager-account'" class="button">Account</button>
+        <button onclick="window.location.href = '/manager-options'" class="button">Edit Booking Options</button>
+    </div>
+    <script>
+
+        // The calendar button should not do anything when clicked if the user is currently on the calendar page
+        // This causes the program to crash as the necessary bookings to display are not calculated before the page is rendered
+        if (window.location.pathname === '/manager-calendar') {
+            let calendarButton = document.getElementById('calendar-button');
+            calendarButton.onclick = null;
+        }
+    </script>
+</head>
+{% block contents %} 
+<body>
+</body>
+{% endblock %}
+</html>

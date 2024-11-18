@@ -1,0 +1,126 @@
+{% extends "BaseNewBookingBanner.html" %}
+{% block contents %}
+<style>
+    .container {
+        margin-top: 10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Tahoma;
+        color: #E5EFC1;
+    }
+    .event-container-wide {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+        font-family: Tahoma;
+        color: #E5EFC1;
+    }
+    .event-container-thin {
+        display: none;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+        font-family: Tahoma;
+        color: #E5EFC1;
+    }
+    input[type=button] {
+        position: fixed;
+        z-index: 999;
+        background-color: #E5EFC1;
+        font-family: Tahoma;
+        color: #F64668;
+        border: none;
+        font-size: large;
+        font-weight: 900;
+        cursor: pointer;
+    }
+    input[type=button]:hover {
+        background-color: grey;
+    }
+    input[type=submit] {
+        padding: 5%;
+        margin: 5%;
+        background-color: #E5EFC1;
+        font-family: Tahoma;
+        color: #41436A;
+        font-size: x-large;
+        font-weight: 900;
+        cursor: pointer;
+        width: fit-content;
+        height: fit-content;
+        border: none;
+        border-radius: 2px;
+        width: fit-content;
+    }
+    input[type=submit]:hover {
+        background-color: #E5EF99;
+    }
+    input[type=text] {
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        border: 2px solid #ccc;
+        padding: 1% 2%;
+        margin: 2%;
+    }
+    .event {
+        width: 200px;
+        padding: 2%;
+        margin: 2%;
+        color: #E5EFC1;
+        background-color: #41436A;
+        border: 4px solid #E5EFC1;
+        font-family: Tahoma;
+        font-size: xx-large;
+        cursor: pointer;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    @media (max-width: 790px) {
+        .container {
+            margin-top: 20%;
+        }
+    }
+</style>
+<div class = "container">
+    <h1 style="text-align: center;">What event are you booking?</h1>
+
+    <form method = 'post' id="event-form">
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-wrap: wrap;">
+
+            <!-- The type of events are displayed -->
+            <div class = 'event'><input name = "Wedding" style = "font-size: large; border: 2px solid #41436A; background-color: #41436A; color: #E5EFC1;" type = "submit" value = "Wedding"></div>
+            {% for event in EventArray %}
+            <div class = 'event'><input name = "{{ event }}" style = "font-size: large; border: 2px solid #41436A; background-color: #41436A; color: #E5EFC1;" type = "submit" value = "{{ event }}"></div>
+            {% endfor %}
+            <div class = 'event'><input name = "Other" style = "font-size: large; border: 2px solid #41436A; background-color: #41436A; color: #E5EFC1;" type = "submit" value = "Other"></div>
+        </div>
+            <div style = 'display: flex; justify-content: center; align-items: center; flex-direction: column;'>
+
+            <!-- The input box for a different type of event is displayed if the user has selected other -->
+            {% if Other == True %}
+            <input name = 'OtherEnter' type = 'text' placeholder="Other">
+            <input name="Wedding" type = "submit" value = "Continue" style="padding: 1%;">
+            {% endif %}
+
+            <!-- Error message -->
+            {% if InvalidOther == True %}
+            <h4 style="color: #F64668;">Event name length must be 1-30 characters</h4>
+            {% endif %}
+        </div>
+    </form>
+</div>
+<script>
+    // The user must not be allowed to submit the form using the enter key as it will automatically trigger a post request with name='wedding'
+    document.getElementById("event-form").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            submitForm();
+        }
+    });
+</script>
+{% endblock %}

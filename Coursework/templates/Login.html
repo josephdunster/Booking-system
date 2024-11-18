@@ -1,0 +1,80 @@
+{% extends "BaseBanner.html" %}
+{% block title %}<title>Login</title>{% endblock %}
+{% block contents %}
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Tahoma;
+    }
+    input[type=text] {
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        border: 2px solid #ccc;
+        height: 70%;
+        width: 90%;
+        margin: 10%;
+        padding: 10%;
+    }
+    input[type=password] {
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        border: 2px solid #ccc;
+        height: 100%;
+        width: 90%;
+        margin: 10%;
+        padding: 10%;
+    }
+    input[type=submit] {
+        background-color: #E5EFC1;
+        font-family: Tahoma;
+        color: #41436A;
+        border: none;
+        font-size: large;
+        font-weight: 900;
+        cursor: pointer;
+        border-radius: 6px;
+        width: 90%;
+        margin: 10%;
+        padding: 10%;
+    }
+    input[type=submit]:hover {
+        background-color: #E5EF99;
+    }
+    h4 {
+        color: #f64668;
+        font-family: Tahoma;
+        margin-top: -3%;
+    }
+</style>
+<br><br>
+<h2 style = "text-align: center; color: #E5EFC1; font-family: Tahoma;" >Please enter your login details</h2>
+<div class = "container">
+
+    <form method = "post">
+    <div class = "container">
+
+        <input name = "username" type = "text" placeholder="Username">
+        <!-- Error message displayed if username does not exist -->
+        {% if UsernameExists == False %}
+        <h4>This username d
+            oes not exist</h4>
+        {% endif %}
+
+        <input name = "password" type = "password" placeholder="Password">
+        <!-- Error message displayed if password is inorrect -->
+        {% if PasswordCorrect == False %}
+        <h4>Incorrect password</h4>
+        {% endif %}
+
+    <input type = "submit" value="Login">
+    </div>
+    </form>
+
+    <!-- Links to sign up and reset password pages -->
+    <a href="/sign-up" style = "color: yellow; font-family: Tahoma; margin: 1%;" >Click here to create an account</a>
+    <a href="/reset-password" style = "color: yellow; font-family: Tahoma; margin: 1%;" >Forgotten password?</a>
+</div>
+{% endblock %}

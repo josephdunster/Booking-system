@@ -1,0 +1,1064 @@
+{% extends "BaseNewBookingBanner.html" %}
+{% block contents %}
+<style>
+    .container {
+        margin-top: 10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Tahoma;
+        color: #E5EFC1;
+        text-align: center;
+    }
+    .horizontal-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        padding: 3%;
+    }
+    .vertical-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    input[type=submit] {
+        padding: 10%;
+        margin: 10%;
+        background-color: #E5EFC1;
+        font-family: Tahoma;
+        color: #41436A;
+        font-size: large;
+        font-weight: 900;
+        cursor: pointer;
+        width: fit-content;
+        height: fit-content;
+        border: none;
+        border-radius: 4px;
+    }
+    input[type=submit]:hover {
+        background-color: #E5EF99;
+    }
+    .custom-border {
+        border: 2px solid #f64668;
+    }
+    input[type=text] {
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        border: 2px solid #ccc;
+        padding: 1% 4%;
+        margin: 0% 2%;
+        text-align: center;
+    }
+    input[type=text]::placeholder {
+        text-align: center;
+    }
+    select {
+        background-color: #E5EFC1;
+        color: black;
+        padding: 5%;
+        border: none;
+    }
+    .other-input {
+        display: none;
+    }
+    li {
+        padding: 1%;
+    }
+    input[type=checkbox] {
+        background-color: #E5EFC1;
+        border: none;
+    }
+    .confirmation {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: Tahoma;
+        color: #E5EFC1;
+        margin-top: 8%;
+        text-align: center;
+    }
+    .event-info {
+        background-color: #E5EFC1;
+        color: #41436A;
+        font-weight: 700;
+        padding: 2% 5%;
+        width: 200px;
+        border-radius: 4px;
+        margin: 2%;
+    }
+    @media (max-width: 790px) {
+        .container {
+            padding-top: 15%;
+        }
+    }
+    @media (max-width: 900px) {
+        .confirmation {
+            margin-top: 18%;
+        }
+    }
+    a {
+        color: yellow;
+    }
+    .error {
+        color: #f64668;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<div class="container" id="container">
+    <h2>Married names of the couple:</h2>
+    <div class="horizontal-container">
+        <div class="vertical-container" style="margin-right: 5%;">
+
+            <!-- Title dropdown menu -->
+            <select id="title-select1" onchange="handleTitleChange1()">
+                <option selected>Mr</option>
+                <option>Mrs</option>
+                <option>Other</option>
+            </select>
+            <div class="other-input" id="other-title-input1">
+                <input id="other-title-text-input1" type="text" placeholder="Other" style="margin-top: 2%; margin-left: 25%; width: 40%;">
+            </div>
+            <!-- Error message -->
+            <h4 class="error" style="display: none;" id="title-1-error">Title must be 1-5 characters in length</h4>
+        </div>
+
+        <!-- Customer name input -->        
+        <div class="vertical-container">
+            <input type="text" placeholder="Full name" id="client-name1">
+            <!-- Error message -->
+            <h4 class="error" style="display: none;" id="client-name-1-error">Full name must be 1-60 character in length</h4>
+        </div>
+    </div>
+
+    <!-- Title dropdown menu -->
+    <div class="horizontal-container">
+        <div class="vertical-container" style="margin-right: 5%;">
+            <select id="title-select2" onchange="handleTitleChange2()">
+                <option selected>Mr</option>
+                <option>Mrs</option>
+                <option>Other</option>
+            </select>
+            <div class="other-input" id="other-title-input2">
+                <input id="other-title-text-input2" type="text" placeholder="Other" style="margin-top: 2%; margin-left: 25%; width: 40%;">
+            </div>
+            <!-- Error message -->
+            <h4 class="error" style="display: none;" id="title-2-error">Title must be 1-5 characters in length</h4>
+        </div>
+
+        <!-- Customer name input -->
+        <div class="vertical-container">
+            <input type="text" placeholder="Full name" id="client-name2">
+            <!-- Error message -->
+            <h4 class="error" style="display: none;" id="client-name-2-error">Full name must be 1-60 character in length</h4>
+        </div>
+    </div>
+
+    <!-- Date input boxes -->
+    <h2 style="margin-bottom: -2%;">Date of wedding:</h2>
+    <div class="horizontal-container">
+        <input id="day-input" type="text" placeholder="DD" style="z-index: 998; margin: -15%; width: fit-content; padding: 2% 0%; width: 100px;">
+        <input id="month-input" type="text" placeholder="MM" style="margin: 0%; width: fit-content; padding: 2% 0%;">
+        <input id="year-input" type="text" placeholder="YYYY" style="z-index: 998; margin: -15%; width: fit-content; padding: 2% 0% 2% 0%; width: 100px;">
+    </div>
+    <!-- Error messages -->
+    <h4 class="error" style="display: none; margin-top: 2%;" id="event-date-error">Date must be in the format DD-MM-YYYY and must be in the future</h4>
+    <h4 class="error" style="display: none;" id="date-unavailable-error">This date is unavailable</h4>
+
+    <!-- Package option select and description -->
+    <h2>Select a package:</h2>
+    <!-- Error messages -->
+    <h4 class="error" style="display: none; margin-top: 2%;" id="package-option-error">Please select a package option</h4>
+    <h3><u>All packages include:</u></h3>
+
+    <div style="text-align: left;">
+        <li>Exclusive use of the venue from 10 am until midnight</li>
+        <li>On the day wedding co-ordinator to oversee your wedding</li>
+        <li>A fully licenced bar</li>
+
+        <div style="display: flex; flex-direction: row;"><input id="package-1-checkbox" type='checkbox' name='myCheckbox' onclick='handleCheckbox(this)'><h3><i>Package 1:</i></h3></div>
+        <h3><i>- Basic sound system for background music.</i></h3>
+        <br>
+        <div style="display: flex; flex-direction: row;"><input id="package-2-checkbox" type='checkbox' name='myCheckbox' onclick='handleCheckbox(this)'><h3><i>Package 2:</i></h3></div>
+        <h3><i>- High quality sound system.</i></h3>
+        <h3><i>- 4ft illuminated 'LOVE' letters.</i></h3>
+        <h3><i>- Access to the bridal suite for pre-wedding preparations.</i></h3>
+        <br>
+        <div style="display: flex; flex-direction: row;"><input id="package-3-checkbox" type='checkbox' name='myCheckbox' onclick='handleCheckbox(this)'><h3><i>Package 3:</i></h3></div>
+        <h3><i>- Cutting edge sound system.</i></h3>
+        <h3><i>- 4ft illuminated 'LOVE' letters.</i></h3>
+        <h3><i>- High quality sound system.</i></h3>
+        <h3><i>- Access to the bridal suite for pre-wedding preparations.</i></h3>
+        <h3><i>- Advanced lighting package for dance floor lighting.</i></h3>
+    </div>
+
+    <!-- Start time dropdown menu -->
+    <div class="horizontal-container">
+        <div class="vertical-container">
+            <h2>Start time</h2>
+            <select id="start-time">
+                <option selected>10:00</option>
+                <option>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option>12:00</option>
+                <option>12:30</option>
+                <option>13:00</option>
+                <option>13:30</option>
+                <option>14:00</option>
+                <option>14:30</option>
+                <option>15:00</option>
+                <option>15:30</option>
+                <option>16:00</option>
+                <option>16:30</option>
+                <option>17:00</option>
+                <option>17:30</option>
+                <option>18:00</option>
+                <option>18:30</option>
+                <option>19:00</option>
+                <option>19:30</option>
+                <option>20:00</option>
+            </select>
+        </div>
+
+        <h3 style="color: #41436A; font-size: xx-small;">...</h3>
+
+        <!-- End time drop down box -->
+        <div class="vertical-container">
+            <h2>End time</h2>
+            <select id="end-time">
+                <option selected>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option>12:00</option>
+                <option>12:30</option>
+                <option>13:00</option>
+                <option>13:30</option>
+                <option>14:00</option>
+                <option>14:30</option>
+                <option>15:00</option>
+                <option>15:30</option>
+                <option>16:00</option>
+                <option>16:30</option>
+                <option>17:00</option>
+                <option>17:30</option>
+                <option>18:00</option>
+                <option>18:30</option>
+                <option>19:00</option>
+                <option>19:30</option>
+                <option>20:00</option>
+                <option>20:30</option>
+                <option>21:00</option>
+                <option>21:30</option>
+                <option>22:00</option>
+                <option>22:30</option>
+                <option>23:00</option>
+                <option>23:30</option>
+                <option>00:00</option>
+            </select>
+        </div>
+    </div>
+    <!-- Error messages -->
+    <h4 class="error" style="display: none;" id="end-time-too-early-error">Event must be at least 30 minutes in length</h4>
+    <h4 class="error" style="display: none;" id="end-time-too-late-error">Events can only finish later than 23:00 on Fridays and Saturdays</h4>
+    
+    <!-- Set up buttons -->
+    <h2 style="margin-bottom: -2%;">Will you require a set up day?</h2>
+    <div class="horizontal-container" style="margin-top: -1%;">
+        <input id="set-up-yes" type="submit" value="Yes" style="width: 100%;" onclick="yesSetUp()">
+        <input id="set-up-no" type="submit" value="No" style="width: 100%;" onclick="noSetUp()">
+    </div>
+    <!-- Error message -->
+    <h4 class="error" style="margin-top: -2%; display: none;" id="set-up-required-error">Please confirm if you require a set up day</h4>
+
+    <!-- Ceremony buttons -->
+    <h2 style="margin-bottom: -2%;">Will the ceremony room be required?</h2>
+    <div class="horizontal-container" style="margin-top: -1%;">
+        <input id="yes-ceremony" type="submit" value="Yes" onclick="handleCeremonyTime()">
+        <input id="no-ceremony" type="submit" value="No" onclick="noCeremony()">
+    </div>
+    <!-- Error message -->
+    <h4 class="error" style="margin-top: -2%; display: none;" id="ceremony-required-error">Please confirm if you require the ceremony room</h4>
+    
+    <!-- Ceremony time dropdown menu -->
+    <div class="other-input" id="ceremony-time-input" style="flex-direction: column;">
+        <h2 style="margin-bottom: -2%;">Ceremony time:</h2>
+        <div class="horizontal-container">
+            <select id="ceremony-time">
+                <option selected>10:00</option>
+                <option>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option>12:00</option>
+                <option>12:30</option>
+                <option>13:00</option>
+                <option>13:30</option>
+                <option>14:00</option>
+                <option>14:30</option>
+                <option>15:00</option>
+                <option>15:30</option>
+                <option>16:00</option>
+                <option>16:30</option>
+                <option>17:00</option>
+                <option>17:30</option>
+                <option>18:00</option>
+            </select>
+        </div>
+    </div>
+    <!-- Error message -->
+    <h4 class="error" style="display: none;" id="ceremony-time-error">Ceremony time must be between start and end time</h4>
+
+    <!-- Guest input boxes -->
+    <h2>Guest numbers:</h2>
+    <input id="adult-guest-number" type="text" placeholder="Number of guests age 18+" style="margin: 1%;">
+    <input id="child-guest-number" type="text" placeholder="Number of guests age 2-17" style="margin: 1%;">
+    <input id="below2-guest-number" type="text" placeholder="Number of guests below 2" style="margin: 1%;">
+    <!-- Error messages -->
+    <h4 class="error" style="display: none;" id="min-guest-number-error">Minimum adult guest number for Saturday: 80<br>Minimum adult guest number for all other days: 60</h4>
+    <h4 class="error" style="display: none;" id="max-guest-number-error">Maximum total guest number is 200</h4>
+    <h4 class="error" style="display: none;" id="guest-number-type-error">Please enter a number</h4>
+    
+    <!-- Welcome drink buttons -->
+    <h2 style="margin-bottom: -2%;">Will welcome drinks be required?</h2>
+    <div class="horizontal-container" style="margin-top: -1%;">
+        <input id="drink-yes" type="submit" value="Yes" onclick="handleDrinkInput()">
+        <input id="drink-no" type="submit" value="No" onclick="noDrinks()">
+    </div>
+    <!-- Error message -->
+    <h4 class="error" style="margin-top: -2%; display: none;" id="welcome-drinks-required-error">Please confirm if you require welcome drinks for your guests</h4>
+    
+    <!-- Adult drink dropdown box and other inputs -->
+    <div class="other-input" id="other-drinks-input" style="flex-direction: column;">
+        <h2>Adult's welcome drink:</h2>
+        <select id="adult-drink-selector" onchange="handleAdultDrinkChange()">
+            {% for Drink in AdultDrinks %}
+            <option>{{ Drink }}</option>
+            {% endfor %}
+        </select>
+        <div class="other-input" id="adult-drink-input">
+            <input id="adult-drink-other" type="text" placeholder="Other" style="margin-top: 5%; margin-left: 21%;">
+        </div>
+        <!-- Error message -->
+        <h4 class="error" style="display: none;" id="adult-welcome-drink-error">Drink must be 1-30 characters in length</h4>
+        
+        <!-- Adult drink dropdown box and other inputs -->
+        <h2>Children's welcome drink:</h2>
+        <select id="child-drink-selector" onchange="handleChildDrinkChange()">
+            {% for Drink in ChildDrinks %}
+            <option>{{ Drink }}</option>
+            {% endfor %}
+        </select>
+        <div class="other-input" id="child-drink-input">
+            <input id="child-drink-other" type="text" placeholder="Other" style="margin-top: 5%; margin-left: 21%;">
+        </div>
+        <!-- Error message -->
+        <h4 class="error" style="display: none;" id="child-welcome-drink-error">Drink must be 1-30 characters in length</h4>
+    </div>
+
+    <!-- Toasting drinks buttons -->
+    <h2 style="margin-bottom: -2%;">Will glasses of champagne be required for toasting?</h2>
+    <div class="horizontal-container" style="margin-top: -1%;">
+        <input id="toast-yes" type="submit" value="Yes" style="width: 100%;" onclick="yesToast()">
+        <input id="toast-no" type="submit" value="No" style="width: 100%;" onclick="noToast()">
+    </div>
+    <!-- Error message -->
+    <h4 class="error" style="margin-top: -2%; display: none;" id="drinks-for-toasting-required-error">Please confirm if you require champagne to make toasts</h4>
+
+    <!-- Additional information input -->
+    <h2>Any additional information?</h2>
+    <input id="notes" type="text" placeholder="(Optional)">
+    <h4 class="error" style="display: none;" id="notes-error">Character limit: 250</h4>
+
+    <!-- Calculate cost and confirm booking buttons -->
+    <div class="horizontal-container">
+        <input type="submit" value="Calculate cost" onclick="calculateCost()">
+        <h3 id="cost-output" style="color: yellow;"></h3>
+    </div>
+    <div class="vertical-container">
+        <input type="submit" value="Confirm Booking" style="color: #f64668;" onclick="sendBookingData()">
+    </div>
+</div>
+
+<!-- Manager confirmation page -->
+<div class="confirmation" id="manager-confirmation">
+    <h2>Event successfully booked</h2>
+    <div class="horizontal-container" style="padding: 0%;">
+        <h3>Event:</h3>
+        <div class="event-info" id="event-confirmation-manager"></div>
+    </div>
+    <div class="horizontal-container" style="padding: 0%;">
+        <h3>Date:</h3>
+        <div class="event-info" id="date-confirmation-manager"></div>
+    </div>
+    <div class="horizontal-container" style="padding: 0%;">
+        <h3>Time:</h3>
+        <div class="event-info" id="time-confirmation-manager"></div>
+    </div>
+    <a href="/manager-bookings">Return to bookings</a>
+</div>
+
+<!-- Customer confirmation page -->
+<div class="confirmation" id="customer-confirmation">
+    <h2>Thank you for your booking request!</h2>
+    <div class="horizontal-container" style="padding: 0%;">
+        <h3>Event:</h3>
+        <div class="event-info" id="event-confirmation"></div>
+    </div>
+    <div class="horizontal-container" style="padding: 0%;">
+        <h3>Date:</h3>
+        <div class="event-info" id="date-confirmation"></div>
+    </div>
+    <div class="horizontal-container" style="padding: 0%;">
+        <h3>Time:</h3>
+        <div class="event-info" id="time-confirmation"></div>
+    </div>
+    <h2>Your request will be reviewed within 7 days</h2>
+    <a href="/customer-bookings">Return to my bookings</a>
+</div>
+<script>
+    // Retrieves the title that the user has chosen
+    function handleTitleChange1() {
+        let titleSelect = document.getElementById("title-select1");
+        let otherTitleInput = document.getElementById("other-title-input1");
+
+        // Checks if the user has selected 'Other' and if they have, the 'Other' input box is displayed
+        if (titleSelect.value === 'Other') {
+            otherTitleInput.style.display = "flex";
+        } else {
+            otherTitleInput.style.display = "none";
+        }
+    }
+    handleTitleChange1();
+
+    // Retrieves the title that the user has chosen
+    function handleTitleChange2() {
+        let titleSelect = document.getElementById("title-select2");
+        let otherTitleInput = document.getElementById("other-title-input2");
+
+        // Checks if the user has selected 'Other' and if they have, the 'Other' input box is displayed
+        if (titleSelect.value === 'Other') {
+            otherTitleInput.style.display = "flex";
+        } else {
+            otherTitleInput.style.display = "none";
+        }
+    }
+    handleTitleChange2();
+
+    // Ensures that only one checkbox can be selected at a time
+    function handleCheckbox(clickedCheckbox) {
+        var checkboxes = document.getElementsByName('myCheckbox');
+
+        // If a second checkbox is selected, the first selected checkbox is un selected
+        checkboxes.forEach(function(checkbox) {
+        if (checkbox !== clickedCheckbox) {
+            checkbox.checked = false;
+        }
+        });
+    }
+
+    // Changes the colour of the border of the yes button to red to make the user aware that they have selected it
+    function yesSetUp() {
+        let yesButton = document.getElementById('set-up-yes');
+        yesButton.style.border = '2px solid #f64668';
+
+        let noButton = document.getElementById('set-up-no');
+        noButton.style.border = 'none';
+    }
+
+    // Changes the colour of the border of the no button to red to make the user aware that they have selected it
+    function noSetUp() {
+        let noButton = document.getElementById('set-up-no');
+        noButton.style.border = '2px solid #f64668';
+
+        let yesButton = document.getElementById('set-up-yes');
+        yesButton.style.border = 'none';
+    }
+
+    // Changes the colour of the border of the yes button to red to make the user aware that they have selected it
+    // Additionally, the option to select a ceremony time is displayed if the user selects yes
+    function handleCeremonyTime() {
+        let CeremonyTimeInput = document.getElementById("ceremony-time-input");
+        let yesButton = document.getElementById('yes-ceremony');
+        let noButton = document.getElementById('no-ceremony');
+
+        noButton.style.border = 'none'
+        yesButton.style.border = '2px solid #f64668'
+        CeremonyTimeInput.style.display = "flex";
+    }
+
+    // Changes the colour of the border of the no button to red to make the user aware that they have selected it
+    // Ensures the option to select a ceremony time is not displayed if the user selects no
+    function noCeremony() {
+        let CeremonyTimeInput = document.getElementById("ceremony-time-input");
+        let yesButton = document.getElementById('yes-ceremony');
+        let noButton = document.getElementById('no-ceremony');
+
+        yesButton.style.border = 'none'
+        noButton.style.border = '2px solid #f64668'
+        CeremonyTimeInput.style.display = "none";
+    }
+
+    // Changes the colour of the border of the yes button to red to make the user aware that they have selected it
+    // Ensures the option to select a welcome drink is displayed if the user selects yes
+    function handleDrinkInput() {
+        let otherDrinksInput = document.getElementById("other-drinks-input");
+        let yesButton = document.getElementById('drink-yes');
+        let noButton = document.getElementById('drink-no');
+
+        yesButton.style.border = '2px solid #f64668'
+        noButton.style.border = 'none'
+        otherDrinksInput.style.display = "flex";
+    }
+
+    // Changes the colour of the border of the no button to red to make the user aware that they have selected it
+    // Ensures the option to select a welcome drink is not displayed if the user selects no
+    function noDrinks() {
+        let otherDrinksInput = document.getElementById("other-drinks-input");
+        let yesButton = document.getElementById('drink-yes');
+        let noButton = document.getElementById('drink-no');
+
+        noButton.style.border = '2px solid #f64668'
+        yesButton.style.border = 'none'
+
+        otherDrinksInput.style.display = "none"
+    }
+
+    // Retrieves the drink that the user has selected
+    function handleAdultDrinkChange() {
+        let drinkSelect = document.getElementById("adult-drink-selector");
+        let otherDrinkInput = document.getElementById("adult-drink-input");
+
+        // Displays the input box if the user has selected 'Other'
+        if (drinkSelect.value === 'Other') {
+            otherDrinkInput.style.display = "flex";
+        } else {
+            otherDrinkInput.style.display = "none";
+        }
+    }
+    handleAdultDrinkChange();
+
+    // Retrieves the drink that the user has selected
+    function handleChildDrinkChange() {
+        let drinkSelect = document.getElementById("child-drink-selector");
+        let otherDrinkInput = document.getElementById("child-drink-input");
+
+        // Displays the input box if the user has selected 'Other'
+        if (drinkSelect.value === 'Other') {
+            otherDrinkInput.style.display = "flex";
+        } else {
+            otherDrinkInput.style.display = "none";
+        }
+    }
+    handleChildDrinkChange();
+
+    // Changes the colour of the border of the yes button to red to make the user aware that they have selected it
+    function yesToast() {
+        let yesButton = document.getElementById('toast-yes');
+        let noButton = document.getElementById('toast-no');
+
+        yesButton.style.border = '2px solid #f64668'
+        noButton.style.border = 'none'
+    }
+
+    // Changes the colour of the border of the no button to red to make the user aware that they have selected it
+    function noToast() {
+        let yesButton = document.getElementById('toast-yes');
+        let noButton = document.getElementById('toast-no');
+
+        noButton.style.border = '2px solid #f64668'
+        yesButton.style.border = 'none'
+    }
+
+    // Retrieves all user inputs,
+    // Passes inputs to the backend to be validated and added to the database,
+    // Renders confirmation page when successfully adding to the database
+    function sendBookingData() {
+        // Titles are retrieved
+        let title1 = $("#title-select1").val();
+        let title2 = $("#title-select2").val();
+
+        // The names of the couple are retrieved
+        let clientName1 = $("#client-name1").val();
+        let clientName2 = $("#client-name2").val();
+
+        // Retrieves the title if the user has entered their own title
+        if (title1 === "Other") {
+            title1 = $("#other-title-text-input1").val();
+        }
+
+        // Retrieves the title if the user has entered their own title
+        if (title2 === "Other") {
+            title2 = $("#other-title-text-input2").val();
+        }
+
+        // Retrieves the inputs into the day, month and year input boxes for the date of the wedding
+        let day = $("#day-input").val();
+        let month = $("#month-input").val();
+        let year = $("#year-input").val();
+
+        // Concatenates the inputs into the correct format
+        let weddingDate = `${year}-${month}-${day}`;
+
+        // Retrieves the checkboxes for each package and stores the package that has been accepted
+        let checkbox1 = document.getElementById("package-1-checkbox");
+        let checkbox2 = document.getElementById("package-2-checkbox");
+        let checkbox3 = document.getElementById("package-3-checkbox");
+
+        let packageOption;
+        if (checkbox1.checked) {
+            packageOption = "1";
+        } else if (checkbox2.checked) {
+            packageOption = "2";
+        } else if (checkbox3.checked) {
+            packageOption = "3";
+        }
+
+        // Retrieves the start time and end time that the user has input
+        let startTime = $("#start-time").val();
+        let endTime = $("#end-time").val();
+
+        // Retrieves the yes and no buttons for the set up
+        let setUpYes = document.getElementById("set-up-yes");
+        let setUpNo = document.getElementById("set-up-no");
+        
+        // Checks which button has the border around it and therefore has been selected
+        let setUpRequired;
+        if (setUpYes.style.border === "2px solid rgb(246, 70, 104)") {
+            setUpRequired = true;
+        } else if (setUpNo.style.border === "2px solid rgb(246, 70, 104)") {
+            setUpRequired = false;
+        }
+
+        // Retrieves the yes and no buttons for the ceremony
+        let ceremonyYes = document.getElementById("yes-ceremony");
+        let ceremonyNo = document.getElementById("no-ceremony");
+        
+        // Checks which button has the border around it and therefore has been selected
+        let ceremonyRequired;
+        let ceremonyTime;
+        if (ceremonyYes.style.border === "2px solid rgb(246, 70, 104)") {
+            ceremonyRequired = true;
+            // Retrrieves the time that the user has selected if they have selected yes
+            ceremonyTime = $("#ceremony-time").val();
+        } else if (ceremonyNo.style.border === "2px solid rgb(246, 70, 104)") {
+            ceremonyRequired = false;
+            ceremonyTime = "null";
+        }
+
+        // Retrieves the number of guests that the user has input
+        let adultGuestNumber = $("#adult-guest-number").val();
+        let childGuestNumber = $("#child-guest-number").val();
+        let below2GuestNumber = $("#below2-guest-number").val();
+
+        // If these fields are left blank, they are automatically set to 0
+        if (adultGuestNumber === "") {
+            adultGuestNumber = 0
+        }
+
+        if (childGuestNumber === "") {
+            childGuestNumber = 0
+        }
+
+        if (below2GuestNumber === "") {
+            below2GuestNumber = 0
+        }
+
+        // Retrieves the yes and no buttons for the welcome drinks
+        let yesWelcomeDrinks = document.getElementById("drink-yes");
+        let noWelcomeDrinks = document.getElementById("drink-no");
+
+        // Checks which button has the border around it and therefore has been selected
+        let welcomeDrinksRequired;
+        let adultWelcomeDrink;
+        let childWelcomeDrink;
+        if (yesWelcomeDrinks.style.border === "2px solid rgb(246, 70, 104)") {
+            welcomeDrinksRequired = true;
+            // Checks the drinks that have been selected if the user selected yes
+            adultWelcomeDrink = $("#adult-drink-selector").val();
+            childWelcomeDrink = $("#child-drink-selector").val();
+            // Retrieves the drink that the user has input if they selected 'Other'
+            if (adultWelcomeDrink === "Other") {
+                adultWelcomeDrink = $("#adult-drink-other").val();
+            }
+            if (childWelcomeDrink === "Other") {
+                childWelcomeDrink = $("#child-drink-other").val();
+            }
+        } else if (noWelcomeDrinks.style.border === "2px solid rgb(246, 70, 104)") {
+            welcomeDrinksRequired = false;
+            adultWelcomeDrink = "null";
+            childWelcomeDrink = "null";
+        }
+
+        // Retrieves the yes and no buttons for the toasting drinks
+        let toastYes = document.getElementById("toast-yes");
+        let toastNo = document.getElementById("toast-no");
+        
+        // Checks which button has the border around it and therefore has been selected
+        let drinksForToastingRequired;
+        if (toastYes.style.border === "2px solid rgb(246, 70, 104)") {
+            drinksForToastingRequired = true;
+        } else if (toastNo.style.border === "2px solid rgb(246, 70, 104)") {
+            drinksForToastingRequired = false;
+        }
+
+        // Retrieves any additional information that the user has input
+        let notes = $("#notes").val();
+        if (notes === "") {
+            notes = "null";
+        }
+
+        // Sends all data that has been gathered to the back end of the system
+        $.ajax({
+            type: "POST",
+            url: "/process-wedding-booking",
+            data: {clientName1: clientName1, 
+                clientName2: clientName2,
+                title1: title1,
+                title2: title2,
+                weddingDate: weddingDate, 
+                packageOption: packageOption, 
+                startTime: startTime, 
+                endTime: endTime, 
+                setUpRequired: setUpRequired, 
+                ceremonyRequired: ceremonyRequired, 
+                ceremonyTime: ceremonyTime, 
+                adultGuestNumber: adultGuestNumber, 
+                childGuestNumber: childGuestNumber, 
+                below2GuestNumber: below2GuestNumber, 
+                welcomeDrinksRequired: welcomeDrinksRequired, 
+                adultWelcomeDrink: adultWelcomeDrink, 
+                childWelcomeDrink: childWelcomeDrink, 
+                drinksForToastingRequired: drinksForToastingRequired, 
+                notes: notes},
+            success: function(response) {
+                // If the data is valid, a confirmation page will be displayed
+                if (response.status === 'success') {
+                    // If the current user is a manager, the manager confirmation page will be displayed
+                    if (response.isAdmin === 1) {
+                        handleValidDataManager(response.typeOfEvent, response.date, response.time);
+                    // if the current user is not a manager, the customer confirmation page will be displayed
+                    } else {
+                        handleValidDataCustomer(response.typeOfEvent, response.date, response.time);
+                    }
+                // If the data is not all valid, the appropriate error messages will be displayed
+                } else {
+                    handleInvalidData(response.errors);
+                }
+            }
+        });
+    }
+    // Displays the customer connfirmation page if the user is a customer
+    function handleValidDataCustomer(typeOfEvent, date, time) {
+        // The booking form is no longer displayed on the screen
+        let bookingForm = document.getElementById("container");
+        bookingForm.style.display = 'none';
+
+        // The type of event will be displayed
+        let eventConfirmation = document.getElementById("event-confirmation");
+        eventConfirmation.textContent = typeOfEvent;
+
+        // The date of event will be displayed
+        let dateConfirmation = document.getElementById("date-confirmation");
+        dateConfirmation.textContent = date;
+
+        // The time of event will be displayed
+        let timeConfirmation = document.getElementById("time-confirmation");
+        timeConfirmation.textContent = time;
+
+        // The customer confirmation page is displayed
+        let customerConfirmation = document.getElementById("customer-confirmation");
+        customerConfirmation.style.display = 'flex';
+    }
+    // Displays the manager confirmation page if the user is a manager
+    function handleValidDataManager(typeOfEvent, date, time) {
+        // The booking form is no longer displayed on the screen
+        let bookingForm = document.getElementById("container");
+        bookingForm.style.display = 'none';
+
+        // The type of event will be displayed
+        let eventConfirmation = document.getElementById("event-confirmation-manager");
+        eventConfirmation.textContent = typeOfEvent;
+
+        // The date of event will be displayed
+        let dateConfirmation = document.getElementById("date-confirmation-manager");
+        dateConfirmation.textContent = date;
+
+        // The time of event will be displayed
+        let timeConfirmation = document.getElementById("time-confirmation-manager");
+        timeConfirmation.textContent = time;
+
+        // The manager confirmation page is displayed
+        let managerConfirmation = document.getElementById("manager-confirmation");
+        managerConfirmation.style.display = 'flex';
+    }
+    // Displays the approproate error messages based on the errors returned from the validation routine
+    function handleInvalidData(errors) {
+
+        // Checks if each error is present in the errors array
+        // If so, the appropriate error message is displayed
+
+        title1Error = document.getElementById("title-1-error");
+        if (errors.includes("Title1")) {
+            title1Error.style.display = 'flex';
+        } else {
+            title1Error.style.display = 'none';
+        }
+
+        title2Error = document.getElementById("title-2-error");
+        if (errors.includes("Title2")) {
+            title2Error.style.display = 'flex';
+        } else {
+            title2Error.style.display = 'none';
+        }
+
+        clientName1Error = document.getElementById("client-name-1-error");
+        if (errors.includes("ClientName1")) {
+            clientName1Error.style.display = 'flex';
+        } else {
+            clientName1Error.style.display = 'none';
+        }
+
+        clientName2Error = document.getElementById("client-name-2-error");
+        if (errors.includes("ClientName2")) {
+            clientName2Error.style.display = 'flex';
+        } else {
+            clientName2Error.style.display = 'none';
+        }
+
+        eventDateError = document.getElementById("event-date-error");
+        if (errors.includes("EventDate")) {
+            eventDateError.style.display = 'flex';
+        } else {
+            eventDateError.style.display = 'none';
+        }
+
+        unavailableDateError = document.getElementById("date-unavailable-error")
+        if (errors.includes("UnavailableDate")) {
+            unavailableDateError.style.display = 'flex';
+        } else {
+            unavailableDateError.style.display = 'none';
+        }
+
+        endTimeTooEarlyError = document.getElementById("end-time-too-early-error");
+        if (errors.includes("EndTimeTooEarly")) {
+            endTimeTooEarlyError.style.display = 'flex';
+        } else {
+            endTimeTooEarlyError.style.display = 'none';
+        }
+
+        endTimeTooLateError = document.getElementById("end-time-too-late-error");
+        if (errors.includes("EndTimeTooLate")) {
+            endTimeTooLateError.style.display = 'flex';
+        } else {
+            endTimeTooLateError.style.display = 'none';
+        }
+
+        packageOptionError = document.getElementById("package-option-error");
+        if (errors.includes("PackageOption")) {
+            packageOptionError.style.display = 'flex';
+        } else {
+            packageOptionError.style.display = 'none';
+        }
+
+        setUpRequiredError = document.getElementById("set-up-required-error");
+        if (errors.includes("SetUpRequired")) {
+            setUpRequiredError.style.display = 'flex';
+        } else {
+            setUpRequiredError.style.display = 'none';
+        }
+
+        ceremonyRequiredError = document.getElementById("ceremony-required-error");
+        if (errors.includes("CeremonyRequired")) {
+            ceremonyRequiredError.style.display = 'flex';
+        } else {
+            ceremonyRequiredError.style.display = 'none';
+        }
+
+        ceremonyTimeError = document.getElementById("ceremony-time-error");
+        if (errors.includes("CeremonyTime")) {
+            ceremonyTimeError.style.display = 'flex';
+        } else {
+            ceremonyTimeError.style.display = 'none';
+        }
+
+        minGuestNumberError = document.getElementById("min-guest-number-error");
+        if (errors.includes("MinGuestNumber")) {
+            minGuestNumberError.style.display = 'flex';
+        } else {
+            minGuestNumberError.style.display = 'none';
+        }
+
+        maxGuestNumberError = document.getElementById("max-guest-number-error");
+        if (errors.includes("MaxGuestNumber")) {
+            maxGuestNumberError.style.display = 'flex';
+        } else {
+            maxGuestNumberError.style.display = 'none';
+        }
+
+        guestNumberTypeError = document.getElementById("guest-number-type-error");
+        if (errors.includes("GuestNumberType")) {
+            guestNumberTypeError.style.display = 'flex';
+        } else {
+            guestNumberTypeError.style.display = 'none';
+        }
+
+        welcomeDrinksRequiredError = document.getElementById("welcome-drinks-required-error");
+        if (errors.includes("WelcomeDrinksRequired")) {
+            welcomeDrinksRequiredError.style.display = 'flex';
+        } else {
+            welcomeDrinksRequiredError.style.display = 'none';
+        }
+
+        adultWelcomeDrinkError = document.getElementById("adult-welcome-drink-error");
+        if (errors.includes("AdultWelcomeDrink")) {
+            adultWelcomeDrinkError.style.display = 'flex';
+        } else {
+            adultWelcomeDrinkError.style.display = 'none';
+        }
+
+        childWelcomeDrinkError = document.getElementById("child-welcome-drink-error");
+        if (errors.includes("ChildWelcomeDrink")) {
+            childWelcomeDrinkError.style.display = 'flex';
+        } else {
+            childWelcomeDrinkError.style.display = 'none';
+        }
+
+        drinksForToastingRequiredError = document.getElementById("drinks-for-toasting-required-error");
+        if (errors.includes("DrinksForToastingRequired")) {
+            drinksForToastingRequiredError.style.display = 'flex';
+        } else {
+            drinksForToastingRequiredError.style.display = 'none';
+        }
+
+        notesError = document.getElementById("notes-error");
+        if (errors.includes("Notes")) {
+            notesError.style.display = 'flex';
+        } else {
+            notesError.style.display = 'none';
+        }
+    }
+
+    function calculateCost() {
+        // Retrieves the inputs into the day, month and year input boxes for the date of the event
+        let day = $("#day-input").val();
+        let month = $("#month-input").val();
+        let year = $("#year-input").val();
+
+        // Concatenates the inputs into the correct format
+        let eventDate = `${year}-${month}-${day}`;
+        
+        // Retrieves the yes and no buttons for the set up
+        let setUpYes = document.getElementById("set-up-yes");
+        let setUpNo = document.getElementById("set-up-no");
+        
+        // Checks which button has the border around it and therefore has been selected
+        let setUpRequired;
+        if (setUpYes.style.border === "2px solid rgb(246, 70, 104)") {
+            setUpRequired = true;
+        } else {
+            setUpRequired = false;
+        }
+
+        // Retrieves the yes and no buttons for the ceremony
+        let ceremonyYes = document.getElementById("yes-ceremony");
+        let ceremonyNo = document.getElementById("no-ceremony");
+
+        // Checks which button has the border around it and therefore has been selected
+        let ceremonyRequired;
+        if (ceremonyYes.style.border === "2px solid rgb(246, 70, 104)") {
+            ceremonyRequired = true;
+        } else {
+            ceremonyRequired = false;
+        }
+
+        // Retrieves the number of guests that the user has input
+        let adultGuestNumber = $("#adult-guest-number").val();
+        let childGuestNumber = $("#child-guest-number").val();
+        let below2GuestNumber = $("#below2-guest-number").val();
+
+        // If these fields are left blank, they are automatically set to 0
+        if (adultGuestNumber === "") {
+            adultGuestNumber = 0
+        }
+
+        if (childGuestNumber === "") {
+            childGuestNumber = 0
+        }
+
+        if (below2GuestNumber === "") {
+            below2GuestNumber = 0
+        }
+
+        // Retrieves the checkboxes for each package and stores the package that has been accepted
+        let checkbox1 = document.getElementById("package-1-checkbox");
+        let checkbox2 = document.getElementById("package-2-checkbox");
+        let checkbox3 = document.getElementById("package-3-checkbox");
+
+        let packageOption;
+        if (checkbox1.checked) {
+            packageOption = "1";
+        } else if (checkbox2.checked) {
+            packageOption = "2";
+        } else if (checkbox3.checked) {
+            packageOption = "3";
+        } else {
+            let packageOptionError = document.getElementById("package-option-error");
+            packageOptionError.style.display = 'flex';
+            return
+        }
+
+        // Sends all data that has been gathered to the back end of the system
+        $.ajax({
+            type: "POST",
+            url: "/calculate-event-cost",
+            data: {setUpRequired: setUpRequired,
+                ceremonyRequired: ceremonyRequired,
+                adultGuestNumber: adultGuestNumber, 
+                childGuestNumber: childGuestNumber,
+                below2GuestNumber: below2GuestNumber,
+                eventDate: eventDate,
+                packageOption: packageOption},
+            success: function(response) {
+                // When the cost has been calculated, it is displayed on the screen or errors are displayed
+                if (response.status === 'success') {
+                    minGuestNumberError = document.getElementById("min-guest-number-error");
+                    minGuestNumberError.style.display = 'none';
+
+                    maxGuestNumberError = document.getElementById("max-guest-number-error");
+                    maxGuestNumberError.style.display = 'none';
+
+                    guestNumberTypeError = document.getElementById("guest-number-type-error");
+                    guestNumberTypeError.style.display = 'none';
+
+                    eventDateError = document.getElementById("event-date-error");
+                    eventDateError.style.display = 'none';
+
+                    let packageOptionError = document.getElementById("package-option-error");
+                    packageOptionError.style.display = 'none';
+
+                    cost = response.cost;
+                    let costOutput = document.getElementById('cost-output');
+                    costOutput.textContent = `£${cost}`
+                } else if (response.error === 'MinGuestNumber') {
+                    minGuestNumberError = document.getElementById("min-guest-number-error");
+                    minGuestNumberError.style.display = 'flex';
+                } else if (response.error === 'MaxGuestNumber') {
+                    maxGuestNumberError = document.getElementById("max-guest-number-error");
+                    maxGuestNumberError.style.display = 'flex';
+                } else if (response.error === 'GuestNumberType') {
+                    guestNumberTypeError = document.getElementById("guest-number-type-error");
+                    guestNumberTypeError.style.display = 'flex';
+                } else {
+                    eventDateError = document.getElementById("event-date-error");
+                    eventDateError.style.display = 'flex';
+                }
+            }
+        });        
+    }
+</script>
+{% endblock %}

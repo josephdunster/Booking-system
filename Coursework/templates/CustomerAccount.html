@@ -1,0 +1,224 @@
+{% extends "BaseCustomerNavBar.html" %}
+{% block title %}<title>Account</title>{% endblock %}
+{% block contents %}
+<style>
+    .container {
+        margin-left: 20%;
+        float: left;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-family: Tahoma;
+        color: #E5EFC1;
+        text-align: left;
+    }
+    .details {
+        background-color: #E5EFC1;
+        color: #41436a;
+        border: none;
+        border-radius: 6px;
+        padding: 2%;
+        width: 100%;
+        font-weight: 800;
+        margin-left: 2%;
+    }
+    button {
+        background-color: #E5EFC1;
+        color: #41436a;
+        border: none;
+        font-family: Tahoma;
+        font-weight: 800;
+        padding: 2%;
+        margin: 5% 2%;
+        width: 80px;
+        height: 80px;
+        cursor: pointer;
+    }
+    .horizontal-container {
+        display: flex;
+        flex-direction: row;
+    }
+    @media (max-width: 768px) {
+        .container {
+            margin-left: none;
+        }
+    }
+    .error {
+        color: #f64668;
+        display: none;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<div class="container">
+    <h1>My Account</h1>
+    <h3>First name:</h3>
+    <input id="firstname" class="details" type="text" value="{{ Firstname }}" disabled>
+    <h4 class="error" id="firstname-error">First name must be between<br>1 and 30 characters</h4>
+    <h3>Surname:</h3>
+    <input id="surname" class="details" type="text" value="{{ Surname }}" disabled>
+    <h4 class="error" id="surname-error">Surname must be between<br>1 and 30 characters</h4>
+    <h3>Phone number:</h3>
+    <input id="phone-number" class="details" type="text" value="{{ PhoneNumber }}" disabled>
+    <h4 class="error" id="phone-invalid-error">Please enter a valid<br>phone number</h4>
+    <h4 class="error" id="phone-exists-error">There is already an account<br>linked to this phone number</h4>
+    <h3>Email address:</h3>
+    <input id="email-address" class="details" type="text" value="{{ EmailAddress }}" disabled>
+    <h4 class="error" id="email-invalid-error">Please enter a valid<br>email address</h4>
+    <h4 class="error" id="email-exists-error">There is already an account<br>linked to this email address</h4>
+    <h3>Username:</h3>
+    <input id="username" class="details" type="text" value="{{ Username }}" disabled style="width: fit-content;">
+    <h4 class="error" id="username-error">Username must be between<br>1 and 30 characters</h4>
+    <h4 class="error" id="username-taken-error">This username already exists</h4>
+    <div class="horizontal-container">
+        <button id="edit-button" style="margin-left: 7%;" onclick="editDetails()">Edit details</button>
+        <button style="color: #f64668;">Delete Account</button>
+    </div>
+    <button style="margin-top: -5%; width: 100%; color: yellow; background-color: #41436a; font-weight: 500;" onclick="window.location.href = '/reset-password'"><u>Change account password</u></button>
+</div>
+<script>
+    function validateChanges(firstname, surname, phoneNumber, emailAddress, username) {
+        // Due to the asynchronus nature of ajax, a promise function is needed
+        return new Promise(function(resolve, reject) {
+            // Data is passed to the backend
+            $.ajax({
+                type: "POST",
+                url: "/process-customer-detail-change",
+                data: {
+                    firstname: firstname,
+                    surname: surname,
+                    phoneNumber: phoneNumber,
+                    emailAddress: emailAddress,
+                    username: username
+                },
+                // When the response from the backend is received, error messages are displayed if the data is invalid
+                success: function(response) {
+                    if (response.status == 'invalid') {
+                        firstNameError = document.getElementById("firstname-error");
+                        if (response.errors.includes("Firstname")) {
+                            firstNameError.style.display = 'flex';
+                        } else {
+                            firstNameError.style.display = 'none';
+                        }
+
+                        surnameError = document.getElementById("surname-error");
+                        if (response.errors.includes("Surname")) {
+                            surnameError.style.display = 'flex';
+                        } else {
+                            surnameError.style.display = 'none';
+                        }
+
+                        invalidPhoneError = document.getElementById("phone-invalid-error");
+                        if (response.errors.includes("PhoneInvalid")) {
+                            invalidPhoneError.style.display = 'flex';
+                        } else {
+                            invalidPhoneError.style.display = 'none';
+                        }
+
+                        phoneExistsError = document.getElementById("phone-exists-error");
+                        if (response.errors.includes("PhoneTaken")) {
+                            console.log("Here");
+                            phoneExistsError.style.display = 'flex';
+                        } else {
+                            phoneExistsError.style.display = 'none';
+                        }
+
+                        invalidEmailError = document.getElementById("email-invalid-error");
+                        if (response.errors.includes("InvalidEmail")) {
+                            invalidEmailError.style.display = 'flex';
+                        } else {
+                            invalidEmailError.style.display = 'none';
+                        }
+
+                        emailExistsError = document.getElementById("email-exists-error");
+                        if (response.errors.includes("EmailExists")) {
+                            emailExistsError.style.display = 'flex';
+                        } else {
+                            emailExistsError.style.display = 'none';
+                        }
+
+                        usernameError = document.getElementById("username-error");
+                        if (response.errors.includes("Username")) {
+                            usernameError.style.display = 'flex';
+                        } else {
+                            usernameError.style.display = 'none';
+                        }
+
+                        usernameTakenError = document.getElementById("username-taken-error");
+                        if (response.errors.includes("UsernameTaken")) {
+                            usernameTakenError.style.display = 'flex';
+                        } else {
+                            usernameTakenError.style.display = 'none';
+                        }
+
+                        // The promise is resolved to false to indicate the text boxes should not yet be locked
+                        resolve(false);
+                    } else {
+                        // If the data is valid, all error messages are removed
+                        firstNameError = document.getElementById("firstname-error");
+                        surnameError = document.getElementById("surname-error");
+                        invalidPhoneError = document.getElementById("phone-invalid-error");
+                        phoneExistsError = document.getElementById("phone-exists-error");
+                        invalidEmailError = document.getElementById("email-invalid-error");
+                        emailExistsError = document.getElementById("email-exists-error");
+                        usernameError = document.getElementById("username-error");
+                        usernameTakenError = document.getElementById("username-taken-error");
+
+                        firstNameError.style.display = 'none';
+                        surnameError.style.display = 'none';
+                        invalidPhoneError.style.display = 'none';
+                        phoneExistsError.style.display = 'none';
+                        invalidEmailError.style.display = 'none';
+                        emailExistsError.style.display = 'none';
+                        usernameError.style.display = 'none';
+                        usernameTakenError.style.display = 'none';
+
+                        // Promise is resolved as true to indicate the text boxes can be locked
+                        resolve(true);
+                    }
+                },
+            });
+        });
+    }
+
+    // An asynchronus function is need to wait for the ajax response
+    async function editDetails() {
+        let textBox = document.getElementById("firstname");
+        let textBoxes = document.querySelectorAll('.details');
+        let editButton = document.getElementById('edit-button');
+
+        // Data is validated if the text boxes have red borders
+        // This means the text boxes are unlocked and therefore data is being entered
+        if (textBox.style.border == '2px solid rgb(246, 70, 104)') {
+            let firstname = $("#firstname").val();
+            let surname = $("#surname").val();
+            let phoneNumber = $("#phone-number").val();
+            let emailAddress = $("#email-address").val();
+            let username = $("#username").val();
+
+            try {
+                // Wait for the validation to complete
+                // If data is valid, the text boxes are locked
+                if (await validateChanges(firstname, surname, phoneNumber, emailAddress, username)) {
+                    textBoxes.forEach(function(textBox) {
+                        textBox.style.border = 'none';
+                        textBox.setAttribute("disabled", "true");
+                        editButton.innerText = 'Edit details';
+                    });
+                }
+            } catch (error) {
+                // Errors are handled if the ajax request fails
+                console.error(error);
+            }
+        } else {
+            // If the borders are not red, the data is not currently being inputted so the text boxes are unlocked
+            textBoxes.forEach(function(textBox) {
+                textBox.style.border = '2px solid #f64668';
+                textBox.removeAttribute("disabled");
+                editButton.innerText = 'Confirm changes';
+            });
+        }
+    }
+</script> 
+{% endblock %}

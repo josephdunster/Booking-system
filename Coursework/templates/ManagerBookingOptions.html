@@ -1,0 +1,341 @@
+{% extends "BaseManagerNavBar.html" %}
+{% block title %}<title>Options</title>{% endblock %}
+{% block contents %}
+<style>
+    .container {
+        margin-left: 15%;
+        display: flex;
+        flex-direction: column;
+        font-family: Tahoma;
+        color: #E5EFC1;
+        text-align: center;
+    }
+    .options {
+        margin-left: 5%;
+        display: grid;
+        grid-template-columns: 1fr 2fr repeat(2, 1fr);
+        grid-template-rows: 1fr 0.1fr 1fr 0.1fr 1fr 0.1fr 1fr 0.1fr;
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: 1fr;
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+    }
+    input[type=text] {
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        border: none;
+        height: 50%;
+        width: 90%;
+        justify-self: center;
+        align-self: center;
+        text-align: center;
+    }
+    input[type=submit] {
+        background-color: #E5EFC1;
+        color: #f64668;
+        font-family: Tahoma;
+        border: none;
+        border-radius: 2px;
+        font-weight: 600;
+        height: 50%;
+        width: 40%;
+        align-self: center;
+        justify-self: center;
+        cursor: pointer;
+    }
+    input[type=button] {
+        background-color: #E5EFC1;
+        color: #f64668;
+        font-family: Tahoma;
+        border: none;
+        border-radius: 2px;
+        font-weight: 600;
+        height: 50%;
+        width: 40%;
+        align-self: center;
+        justify-self: center;
+        cursor: pointer;
+    }
+    input[type=text]::placeholder {
+        text-align: center;
+    }
+    .left-text::placeholder {
+        text-align: left;
+    }
+    .right-text::placeholder {
+        text-align: right;
+    }
+    h3 {
+        align-self: center;
+        text-align: left;
+    }
+    select {
+        text-align: center;
+        font-family: Tahoma;
+        color: #41436a;
+        background-color: #E5EFC1;
+        height: 50%;
+        width: 80%;
+        border: none;
+        border-radius: 2px;
+        font-weight: 700;
+        align-self: center;
+        margin-left: 4%;
+    }
+    .vertical-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .error {
+        color: #f64668;
+        margin-top: -5%;
+        margin-bottom: -2%;
+        text-align: left;
+    }
+    .confirm {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+<div class="container">
+    <h1 style="margin-top: 2%; margin-left: -4%;">Edit Booking Options</h1>
+    <h2 style="text-align: left; margin-left: 5%;"><u>Add Options</u></h2>
+
+    <form method = 'post' id="option-form">
+        <div class="options">
+
+            <!-- Inputs for a new type of event -->
+            <h3>Type of event:</h3>
+            <div class="grid">
+                <input name="new-event" type="text" placeholder="New event" style="margin-left: 7%;">
+                <input name="adult-price" type="text" placeholder="Cost per Adult">
+            </div>
+            <input name="child-price" type="text" placeholder="Cost per Child">
+            <input type="submit" value="Add" name="add-event">
+            <div>
+                <!-- Error messages -->
+                {% if EventExistsError == True %}
+                <h5 class="error">This event already exists</h5>
+                {% endif %}
+                {% if InvalidEventError == True %}
+                <h5 class="error">Event name length must be 1-30 characters</h5>
+                {% endif %}
+                {% if InvalidCostError == True %}
+                <h5 class="error">Please enter a valid cost</h5>
+                {% endif %}
+            </div>
+
+            <!-- Divs to fill empty grid spaces -->
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <!-- Inputs for a new unavailable date -->
+            <h3>Unavailable date:</h3>
+            <div style="margin-left: 4%; display: flex;">
+                <input name="day-input" type="text" placeholder="DD" style="height: 40%; z-index: 998; margin-right: -3%; width: 100px;align-self: center;">
+                <input name="month-input" type="text" placeholder="MM" style="height: 40%; margin: 0%; width: 100px; align-self: center; justify-self: center;">
+                <input name="year-input" type="text" placeholder="YYYY" style="height: 40%; z-index: 998; margin-left: -3%; width: 100px; align-self: center;">
+            </div>
+            <div></div>
+            <input type="submit" value="Add" name="add-date">
+            <div>
+                <!-- Error messages -->
+                {% if InvalidDate == True %}
+                <h5 class="error">Please enter a valid date (DD-MM-YYYY) in the future</h5>
+                {% endif %}
+                {% if UnavailableDateExists == True %}
+                <h5 class="error">This date is already unavailable</h5>
+                {% endif %}
+                {% if CancelledBooking == True %}
+                <h5 class="error" style="color: yellow;">This date is now unavailable - the booking that was on this date has been cancelled</h5>
+                {% endif %}
+            </div>
+
+            <!-- Divs to fill empty grid spaces -->
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <!-- Inputs for a new adult welcome drink -->
+            <h3>Adult's welcome drink:</h3>
+            <input type="text" placeholder="New drink" name="new-adult-drink">
+            <div></div>
+            <input type="submit" value="Add" name="add-adult-drink">
+            <div>
+                <!-- Error messages -->
+                {% if AdultDrinkExists == True %}
+                <h5 class="error">This drink already exists</h5>
+                {% endif %}
+                {% if InvalidAdultDrink == True %}
+                <h5 class="error">Adult drink length must be 1-30 characters</h5>
+                {% endif %}
+            </div>
+
+            <!-- Divs to fill empty grid spaces -->
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <!-- Inputs for a new children's welcome drink -->
+            <h3>Children's welcome drink:</h3>
+            <input type="text" placeholder="New drink" name="new-child-drink">
+            <div></div>
+            <input type="submit" value="Add" name="add-child-drink">
+            <div>
+                <!-- Error messages -->
+                {% if ChildDrinkExists == True %}
+                <h5 class="error">This drink already exists</h5>
+                {% endif %}
+                {% if InvalidChildDrink == True %}
+                <h5 class="error">Child drink length must be 1-30 characters</h5>
+                {% endif %}
+            </div>
+
+            <!-- Divs to fill empty grid spaces -->
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <h2 style="text-align: left; margin-left: 5%;"><u>Remove Options</u></h2>
+        <div class="options">
+    
+            <!-- Drop down box and confirmation menu for a type of event to be removed -->
+            <h3 style="align-self: center;">Type of event:</h3>
+            <select name="event-select">
+                {% for Event in CurrentEvents %}
+                <option>{{ Event }}</option>
+                {% endfor %}
+            </select>
+            <div id="empty-event"></div>
+            <h4 id="confirm-remove-event-message" style="display: none; color: #f64668;">Are your sure you want to remove this type of event?</h4>
+            <input id="remove-event" type="button" value="Remove" onclick="confirmEvent()">
+            <div class="confirm" id="confirm-event">
+                <input style="margin: 1%;" type="submit" name="remove-event" value="Yes">
+                <input style="margin: 1%;" type="button" value="No" onclick="closeConfirmMenu()">
+            </div>
+
+            <!-- Drop down box and confirmation menu for an unavailable date to be removed -->
+            <h3 style="align-self: center;">Unavailable date:</h3>
+            <select name="date-select">
+                {% for Date in UnavailableDates %}
+                <option>{{ Date }}</option>
+                {% endfor %}
+            </select>
+            <div id="empty-date"></div>
+            <h4 id="confirm-remove-date-message" style="display: none; color: #f64668;">Are your sure you want to make this date available?</h4>
+            <input id="remove-date" type="button" value="Remove" onclick="confirmDate()">
+            <div class="confirm" id="confirm-date">
+                <input style="margin: 1%;" type="submit" name="remove-date" value="Yes">
+                <input style="margin: 1%;" type="button" value="No" onclick="closeConfirmMenu()">
+            </div>
+
+            <!-- Drop down box and confirmation menu for an adult welcome drink to be removed -->
+            <h3>Adult's welcome drink:</h3>
+            <select name="adult-drink-select">
+                {% for Drink in AdultDrinks %}
+                <option>{{ Drink }}</option>
+                {% endfor %}
+            </select>
+            <div id="empty-adult-drink"></div>
+            <h4 id="confirm-remove-adult-drink-message" style="display: none; color: #f64668;">Are your sure you want to remove this drink?</h4>
+            <input id="remove-adult-drink" type="button" value="Remove" onclick="confirmAdultDrink()">
+            <div class="confirm" id="confirm-adult-drink">
+                <input style="margin: 1%;" type="submit" name="remove-adult-drink" value="Yes">
+                <input style="margin: 1%;" type="button" value="No" onclick="closeConfirmMenu()">
+            </div>
+
+            <!-- Drop down box and confirmation menu for a children's welcome drink to be removed -->
+            <h3>Children's welcome drink:</h3>
+            <select name="child-drink-select">
+                {% for Drink in ChildDrinks %}
+                <option>{{ Drink }}</option>
+                {% endfor %}
+            </select>
+            <div id="empty-child-drink"></div>
+            <h4 id="confirm-remove-child-drink-message" style="display: none; color: #f64668;">Are your sure you want to remove this drink?</h4>
+            <input id="remove-child-drink" type="button" value="Remove" onclick="confirmChildDrink()">
+            <div class="confirm" id="confirm-child-drink">
+                <input style="margin: 1%;" type="submit" name="remove-child-drink" value="Yes">
+                <input style="margin: 1%;" type="button" value="No" onclick="closeConfirmMenu()">
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    // The user must not be allowed to submit the form using the enter key as it will automatically trigger a post request with name='add-new-event'
+    document.getElementById("option-form").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            submitForm();
+        }
+    });
+
+    function closeConfirmMenu() {
+        // The page is reloaded to close any menus
+        location.reload();
+    }
+    
+    function confirmEvent() {
+        // The yes or no confirmation buttons are displayed
+        removeButton = document.getElementById('remove-event');
+        confirmMenu = document.getElementById('confirm-event');
+        empty = document.getElementById('empty-event');
+        message = document.getElementById('confirm-remove-event-message');
+
+        empty.style.display = 'none';
+        message.style.display = 'flex';
+        confirmMenu.style.display = 'flex';
+        removeButton.style.display = 'none';
+    }
+
+    function confirmDate() {
+        // The yes or no confirmation buttons are displayed
+        removeButton = document.getElementById('remove-date');
+        confirmMenu = document.getElementById('confirm-date');
+        empty = document.getElementById('empty-date');
+        message = document.getElementById('confirm-remove-date-message');
+
+        empty.style.display = 'none';
+        message.style.display = 'flex';
+        confirmMenu.style.display = 'flex';
+        removeButton.style.display = 'none';
+    }
+
+    function confirmAdultDrink() {
+        // The yes or no confirmation buttons are displayed
+        removeButton = document.getElementById('remove-adult-drink');
+        confirmMenu = document.getElementById('confirm-adult-drink');
+        empty = document.getElementById('empty-adult-drink');
+        message = document.getElementById('confirm-remove-adult-drink-message');
+
+        empty.style.display = 'none';
+        message.style.display = 'flex';
+        confirmMenu.style.display = 'flex';
+        removeButton.style.display = 'none';
+    }
+
+    function confirmChildDrink() {
+        // The yes or no confirmation buttons are displayed
+        removeButton = document.getElementById('remove-child-drink');
+        confirmMenu = document.getElementById('confirm-child-drink');
+        empty = document.getElementById('empty-child-drink');
+        message = document.getElementById('confirm-remove-child-drink-message');
+
+        empty.style.display = 'none';
+        message.style.display = 'flex';
+        confirmMenu.style.display = 'flex';
+        removeButton.style.display = 'none';
+    }
+</script>
+{% endblock %}

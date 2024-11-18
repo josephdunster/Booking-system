@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}<title>Document</title>{% endblock %}
+    <style>
+        body {
+            background-color: #41436A;
+        }
+        .button-container {
+            width: 15%;
+            float: left;
+            display: flex;
+            flex-direction: column;
+            height: 98vh;
+            position: fixed;
+        }
+        input[type=submit] {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #E5EFC1;
+            color: #E5EFC1;
+            border: none;
+            width: 90%;
+            height: 8px;
+            margin: 5%;
+            cursor: pointer;
+            border-radius: 2px;
+            z-index: 999;
+        }
+        .button {
+            width: 100%;
+            height: 50%;
+            color: #E5EFC1;
+            background-color: #41436A;
+            border: 4px solid #E5EFC1;
+            margin-bottom: -10%;
+            font-family: Tahoma;
+            font-size: x-large;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #282946;
+        }
+        .small-nav-bar-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            float: left;
+            width: 10%;
+        }
+        .pop-up-nav-bar {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+            float: left;
+            background-color: #41436A;
+            color: #41436A;
+            border: 2px solid black;
+            text-align: center;
+            margin-top: -1%;
+            margin-left: -11%;
+            padding-top: 10%;
+        }
+        @media (max-width: 950px) {
+            .button-container {
+                display: none;
+            }
+            .small-nav-bar-container {
+                display: flex;
+            }
+        }
+        @media (min-width: 950px) {
+            .button-container {
+                display: flex;
+            }
+            .small-nav-bar-container {
+                display: none;
+            }
+            a {
+                display: none;
+            }
+            .pop-up-nav-bar {
+                border: none;
+            }
+        }
+        a {
+            font-family: Tahoma;
+            font-weight: 700;
+            margin: 2%;
+            background-color: #E5EFC1;
+            color: #41436A;
+            border: none;
+            padding: 2%;
+            margin: 2%;
+            border-radius: 2px;
+            width: 70%;
+        }
+    </style>
+    <div class = "button-container">
+        <button onclick="window.location.href = '/customer-bookings'" class="button">Bookings</button>
+        <button onclick="window.location.href = '/customer-account'" class="button">Account</button>
+    </div>
+    <div id="small-nav-bar-container" class="small-nav-bar-container">
+        <input type="submit" onclick="toggleNavBar()">
+        <input type="submit" onclick="toggleNavBar()">
+        <input type="submit" onclick="toggleNavBar()">
+    </div>
+    <div id="pop-up-nav-bar" class="pop-up-nav-bar">
+        <a href="/customer-bookings">Bookings</a>
+        <a href="/customer-account">Account</a>
+    </div>
+    <script>
+        function toggleNavBar() {
+            let popUpNavBar = document.getElementById("pop-up-nav-bar");
+            if (popUpNavBar.style.display === "flex") {
+                popUpNavBar.style.display = "none";
+            } else {
+                popUpNavBar.style.display = "flex"
+            }
+        }
+    </script>
+</head>
+{% block contents %} 
+<body>
+</body>
+{% endblock %}
+</html>

@@ -1,0 +1,152 @@
+{% extends "BaseBanner.html" %}
+{% block title %}<title>Sign up</title>{% endblock %}
+{% block contents %}
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Tahoma;
+        text-align: center;
+    }
+    .inner-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10%;
+    }
+    .form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    @media (min-width: 768px) {
+        .inner-container {
+            width: 50%;
+        }
+    }
+    input[type=text] {
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        border: 2px solid #ccc;
+        height: 10%;
+        width: 50%;
+        margin: 4%;
+        padding: 2%;
+    }
+    input[type=password] {
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        border: 2px solid #ccc;
+        height: 10%;
+        width: 50%;
+        margin: 4%;
+        padding: 2%;
+    }
+    input[type=submit] {
+        background-color: #E5EFC1;
+        font-family: Tahoma;
+        color: #41436A;
+        border: none;
+        font-size: medium;
+        font-weight: 900;
+        cursor: pointer;
+        border-radius: 6px;
+        width: fit-content;
+        margin: 5%;
+        padding: 3%;
+    }
+    input[type=submit]:hover {
+        background-color: #E5EF99;
+    }
+    .checkbox-error {
+        display: none;
+        color: #f64668;
+    }
+    h4 {
+        color: #f64668;
+        font-family: Tahoma;
+        margin-top: -3%;
+    }
+</style>
+<br>
+<h2 style = "text-align: center; color: #E5EFC1; font-family: Tahoma;" >Please enter your details</h2>
+<form method = 'post'>
+    <div class = 'inner-container' style="float: left;">
+        <h3 style = "color: #E5EFC1; font-family: Tahoma;">Personal Details</h3>
+
+        <!-- First name input -->
+        <input name="first-name" type = "text" placeholder="First name">
+        <!-- Error messages -->
+        {% if FirstNameValid == False %}
+        <h4>First name must be between 1 and 30 characters</h4>
+        {% endif %}
+
+        <!-- Surname input -->
+        <input name="surname" type = "text" placeholder="Surname">
+        <!-- Error message -->
+        {% if SurnameValid == False %}
+        <h4>Surname must be between 1 and 30 characters</h4>
+        {% endif %}
+
+        <!-- Phone number input -->
+        <input name="phone-number" type = "text" placeholder="Phone number">
+        <!-- Error messages -->
+        {% if PhoneNumberValid == False %}
+        <h4>Please enter a valid UK phone number</h4>
+        {% elif PhoneUnique == False %}
+        <h4>There is already an account linked to this phone number</h4>
+        {% endif %}
+
+        <!-- Email address input -->
+        <input name="email-address" type = "text" placeholder="Email address">
+        <!-- Error messages -->
+        {% if EmailAddressValid == False %}
+        <h4>Please enter a valid email address</h4>
+        {% elif EmailUnique == False %}
+        <h4>There is already an account linked to this email address</h4>
+        {% endif %}
+
+        <!-- Age confirmation -->
+        <span style = "display: flex; flex-direction: row; justify-content: center; align-items: center;"><p style = "margin-right: 2%; text-align: center; color: #E5EFC1; font-family: Tahoma;">Please confirm that you<br>are at least 18 years of age</p><input name="checkbox" type = 'checkbox'></span>
+        <!-- Error message -->
+        {% if CheckboxError == True %}
+        <h4>Please confirm that you are at least 18 years of age</h4>
+        {% endif %}
+    </div>
+
+    <div class = 'inner-container' style="float: right;">
+        <h3 style = "color: #E5EFC1; font-family: Tahoma;">Account information</h3>
+
+        <!-- Username input -->
+        <input name="username" type = "text" placeholder="Username">
+        <!-- Error messages -->
+        {% if UsernameValid == False %}
+        <h4>Username must be between 1 and 30 characters</h4>
+        {% elif UsernameUnique == False %}
+        <h4>This username already exists</h4>
+        {% endif %}
+
+        <!-- Password input -->
+        <input name="password" type = "password" placeholder="Password">
+        <!-- Error message -->
+        {% if PasswordValid == False %}
+        <h4>Password must be at least 8 characters in length</h4>
+        {% endif %}
+
+        <!-- Confirm password input -->
+        <input name="confirm-password" type = "password" placeholder="Confirm password">
+        <!-- Error message -->
+        {% if PasswordMatch == False %}
+        <h4>Passwords do not match</h4>
+        {% endif %}
+        
+        <input type = "submit" value="Create account">
+        <a href="/login" style = "color: yellow; font-family: Tahoma;" >Already have an account?<br>Log in here</a>
+    </div>
+</form> 
+{% endblock %}

@@ -1,0 +1,923 @@
+{% extends "BaseManagerNavBar.html" %}
+{% block title %}<title>Bookings</title>{% endblock %}
+{% block contents %}
+<style>
+    .container {
+        margin-left: 15%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Tahoma;
+        color: #E5EFC1;
+        text-align: center;
+    }
+    .booking-box {
+        background-color: #f64668;
+        color: #E5EFC1;
+        border-radius: 12px;
+        width: 95%;
+        text-align: left;
+        padding-left: 2%;
+        margin-bottom: 0%;
+        margin-top: 2%;
+        font-size: x-small;
+        display: flex;
+        flex-direction: row;
+        align-items: top;
+        justify-content: center;
+    }
+    .vertical-container {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        width: 22.5%;
+    }
+    .book-button {
+        background-color: #E5EFC1;
+        color: #42436a;
+        border: none;
+        font-family: Tahoma;
+        margin: 2%;
+        width: 80%;
+        height: 50px;
+        font-weight: 700;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .book-button-container{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    .edit-delete-accept-reject {
+        background-color: inherit;
+        color: #E5EFC1;
+        border: none;
+        font-weight: 700;
+        font-size: medium;
+        cursor: pointer;
+    }
+    .horizontal-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+    input[type=submit] {
+        background-color: #42436a;
+        color: #E5EFC1;
+        font-family: Tahoma;
+        border: none;
+        font-size: x-large;
+        width: 50px;
+        padding: 2%;
+        margin: 2%;
+        cursor: pointer;
+    }
+    input[type=text] {
+        width: fit-content;
+        justify-self: center;
+        align-self: center;
+    }
+    .error {
+        display: none;
+        color: #f64668;
+        align-self: center;
+        justify-self: center;
+        padding: 2%;
+    }
+    input[type=button] {
+        background-color: inherit;
+        border: none;
+        color: inherit;
+        font-family: Tahoma;
+        font-size: large;
+        font-weight: 600;
+        padding: 1%;
+        cursor: pointer;
+    }
+    .edit-menu {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .edit-details-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 3%;
+        width: 100%;
+    }
+    .label {
+        margin-top: -0.4%;
+    }
+    input[type=text] {
+        background-color: #E5EFC1;
+        color: #42436a;
+        font-family: Tahoma;
+        border: 1px solid #42436a;
+        font-weight: 600;
+        text-align: center;
+        width: 20%;
+        margin-left: 2%;
+    }
+    .search-menu {
+        display: none;
+        flex-direction: column;
+        padding-bottom: 3%;
+    }
+    .search-menu-container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80%;
+        padding: -2%;
+        flex-direction: column;
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        margin-left: 2%;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<div class="container">
+    <h1 style="margin-top: 2%; margin-left: -4%;">Bookings</h1>
+
+    <div class="book-button-container">
+        <button onclick="window.location.href = '/new-booking/select-customer'" class="book-button">+ Book event</button>
+
+        <!-- Search menu -->
+        <div class="search-menu-container" style="flex-direction: column;">
+            <button class="book-button" onclick="toggleSearchMenu()" style="margin: 0%;">Search Bookings</button>
+
+            <div class="search-menu" id="search-menu">
+                <div class="horizontal-container" style=>
+                    <input type="text" placeholder="Customer's name" id="name-search" style="background-color: #42436a; color: white; width: fit-content; font-weight: 200; border-radius: 3px;">
+                    <input type="submit" value="Search" onclick="nameSearch()" style="font-size: medium; width: fit-content; border-radius: 2px;">
+                </div>
+
+                <div class="horizontal-container">
+                    <input type="text" placeholder="Number of adult guests" id="guest-number" style="background-color: #42436a; color: white; width: fit-content; font-weight: 200; border-radius: 3px;">
+                    <input type="submit" value="Search" onclick="guestNumberSearch()" style="font-size: medium; width: fit-content; border-radius: 2px;">
+                </div>
+
+                <div class="horizontal-container">
+                    <input type="text" placeholder="DD" id="date-day" style="background-color: #42436a; color: white; width: 20%; font-weight: 200; border-radius: 3px;">
+                    <input type="text" placeholder="MM" id="date-month" style="background-color: #42436a; color: white; width: 20%; font-weight: 200; border-radius: 3px;">
+                    <input type="text" placeholder="YYYY" id="date-year" style="background-color: #42436a; color: white; width: 20%; font-weight: 200; border-radius: 3px;">
+                    <input type="submit" value="Search" onclick="dateSearch()" style="font-size: medium; width: fit-content; border-radius: 2px;">
+                </div>
+                <!-- Error message -->
+                <h5 id="error" style="color: #f64668; display: none; margin-left: 6%;">No bookings found matching this criteria</h5>
+
+            </div>
+        </div>
+
+        <!-- Sort menu -->
+        <form id="sort-form" style="width: 100%;" method="post">
+            <select name="sort-select" class="book-button" style="text-align: center;" id="sort-select">
+                <option selected>Sort Bookings</option>
+                <option value="closest">Date of event: Closest first</option>
+                <option value="furthest">Date of event: Furthest first</option>
+                <option value="low">Number of adult guests: Low to high</option>
+                <option value="high">Number of adult guests: High to low</option>
+                <option value="recent">Date of booking: Most recent first</option>
+                <option value="oldest">Date of booking: Oldest first</option>
+            </select>
+        </form>
+
+        <script>
+
+            // The form is submitted whenever a different sort is selected
+            const form = document.getElementById('sort-form');
+            const select = document.getElementById('sort-select');
+
+            select.addEventListener('change', () => {
+                form.submit();
+            });
+        </script>
+
+        <button class="book-button">Filter Bookings</button>
+    </div>
+
+    <!-- Each booking that is being displayed has a booking box created -->
+    {% for Booking in BookingsToDisplay %}
+    <div id="{{ Booking[0] }}-box" class="booking-box" {% if Booking[12] == False %} style="background-color: #ffff99; color: #42436a;" {% endif %}>
+
+        <div class="vertical-container" style="width: 55%; margin-right: 2%;">
+
+            <!-- The customer name/names are displayed -->
+            <h2>{{ Booking[4] }} - <span class="customer-name">{{ Booking[1] }} {% if Booking[2] != 'null' %} & {{ Booking[2] }} {% endif %}</span></h2>
+
+            <!-- The date of the booking is displayes -->
+            <h2>{{ Booking[5] }} {{ Booking[6] }}</h2>
+
+            <!-- The start and end time of the booking is displayed -->
+            <h2>{{ Booking[7] }} - {{ Booking[8] }}</h2>
+        </div>
+
+        <!-- The booking date in the form YYYY-MM-DD is also included but not displayed. It is needed for the sorts -->
+        <h2 style="display: none;" class="booking-date">{{ Booking[25] }}</h2>
+        <!-- The adult guest number is also included but not displayed. It is also needed for one of the sorts -->
+        <h2 style="display: none;" class="adult-guest-number">{{ Booking[9] }}</h2>
+
+        <!-- Edit and cancel buttons displayed if the booking is accepted, Accept and reject buttons displayed if the booking is not yet accepted -->
+        <div class="horizontal-container" id="{{ Booking[0] }}-buttons" style="width: 45%;">
+            <div class="vertical-container">{% if Booking[12] == False %} <button id="{{ Booking[0] }}-accept" style="color: #42436a;" class="edit-delete-accept-reject" onclick="confirm('accept', '{{ Booking[0] }}')">Accept</button> {% else %} <button id="{{ Booking[0] }}-edit" class="edit-delete-accept-reject" onclick="editBooking('{{ Booking[0] }}')">Edit</button> {% endif %}</div>
+            <div class="vertical-container">{% if Booking[12] == False %} <button id="{{ Booking[0] }}-reject" style="color: #42436a;" class="edit-delete-accept-reject" onclick="confirm('reject', '{{ Booking[0] }}')">Reject</button> {% else %} <button id="{{ Booking[0] }}-cancel" class="edit-delete-accept-reject" onclick="confirm('cancel', '{{ Booking[0] }}')">Cancel</button> {% endif %}</div>
+        </div>
+
+        <!-- An acceptance confirmation menu is created for each booking -->
+        <div class="{{ Booking[0] }}-accept-menu" id="{{ Booking[0] }}-accept-menu" style="width: 45%; display: none; flex-direction: column;">
+            <h2 style="text-align: center;">Are you sure you want to accept this booking?</h2>
+            <div class="horizontal-container">
+                <input type="submit" value="Yes" onclick="acceptBooking({{ Booking[0] }})">
+                <input type="submit" value="No" onclick="closeConfirm()">
+            </div>
+        </div>
+
+        <!-- A cancel confirmation menu is created for each booking -->
+        <div class="{{ Booking[0] }}-cancel-menu" id="{{ Booking[0] }}-cancel-menu" style="width: 45%; display: none; flex-direction: column;">
+            <h2 style="text-align: center;">Are you sure you want to cancel this booking?</h2>
+            <div class="horizontal-container">
+                <input type="submit" value="Yes" onclick="cancelReason({{ Booking[0] }})">
+                <input type="submit" value="No" onclick="closeConfirm()">
+            </div>
+        </div>
+
+        <!-- A rejection confirmation menu is created for each booking -->
+        <div class="{{ Booking[0] }}-reject-menu" id="{{ Booking[0] }}-reject-menu" style="width: 45%; display: none; flex-direction: column;">
+            <h2 style="text-align: center;">Are you sure you want to reject this booking?</h2>
+            <div class="horizontal-container">
+                <input type="submit" value="Yes" onclick="rejectReason({{ Booking[0] }})">
+                <input type="submit" value="No" onclick="closeConfirm()">
+            </div>
+        </div>
+
+        <!-- A menu asking the user why they are cancelling the booking is created for each booking -->
+        <div class="{{ Booking[0] }}-cancel-reason" id="{{ Booking[0] }}-cancel-reason" style="width: 45%; display: none; flex-direction: column;">
+            <h2 style="text-align: center;">What is the reason for cancelling this booking?</h2>
+            <input id="{{ Booking[0] }}-cancellation-reason" type="text" placeholder="Reason">
+            <h3 id="{{ Booking[0] }}-cancel-error" class="error" style="background-color: white; border: 2px solid black;">Reason must be 5-60 characters in length</h3>
+            <input type="submit" value="Continue" onclick="cancelBooking({{ Booking[0] }})" style="width: fit-content; align-self: center;">
+        </div>
+
+        <!-- A menu asking the user why they are rejecting the booking is created for each booking -->
+        <div class="{{ Booking[0] }}-reject-reason" id="{{ Booking[0] }}-reject-reason" style="width: 45%; display: none; flex-direction: column;">
+            <h2 style="text-align: center;">What is the reason for rejecting this booking?</h2>
+            <input id="{{ Booking[0] }}-rejection-reason" type="text" placeholder="Reason">
+            <h3 id="{{ Booking[0] }}-reject-error" class="error">Reason must be 5-60 characters in length</h3>
+            <input type="submit" value="Continue" onclick="rejectBooking({{ Booking[0] }})" style="width: fit-content; align-self: center;">
+        </div>
+
+        <!-- An edit menu is created for each booking -->
+        <div class="edit-menu" id="{{ Booking[0] }}-edit-menu" style="margin-top: 2%;">
+            <div class="edit-details-container">
+                <h2 class="label">Customer name:</h2>
+                <input id="{{ Booking[0] }}-customer-name1" type="text" value="{{ Booking[1] }}" style="width: fit-content;">
+            </div>
+            
+            <!-- The option to change the second customers name is only displayed if there are two customers in the given event -->
+            {% if Booking[2] != 'null' %}
+            <div class="edit-details-container">
+                <h2 class="label">Customer name:</h2>
+                <input id="{{ Booking[0] }}-customer-name2" type="text" value="{{ Booking[2] }}" style="width: fit-content;">
+            </div>
+            {% endif %}
+            <!-- Error message -->
+            <h3 id="{{ Booking[0] }}-client-name-error" class="error" style="background-color: white; border: 2px solid black;">Customer name must be 1-30 characters in length</h3>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Type of event:</h2>
+                <input id="{{ Booking[0] }}-event" type="text" value="{{ Booking[4] }}" style="width: fit-content;">
+            </div>
+            <!-- Error message -->
+            <h3 id="{{ Booking[0] }}-invalid-event-error" class="error" style="background-color: white; border: 2px solid black;">Please enter an existing event type</h3>
+            
+            <!-- The option to change the package is only displayed if the type of event is a wedding -->
+            {% if Booking[26] != '' %}
+            <div class="edit-details-container">
+                <h2 class="label">Package option:</h2>
+                <input id="{{ Booking[0] }}-package" type="text" value="{{ Booking[26] }}" placeholder="Package">
+            </div>
+            <!-- Error message -->
+            <h3 id="{{ Booking[0] }}-package-error" class="error" style="background-color: white; border: 2px solid black;">Package option must be 1, 2 or 3</h3>
+            {% endif %}
+            
+            <div class="edit-details-container">
+                <input id="{{ Booking[0] }}-day" type="text" value="{{ Booking[25][8:10] }}" placeholder="DD">
+                <input id="{{ Booking[0] }}-month" type="text" value="{{ Booking[25][5:7] }}" placeholder="MM">
+                <input id="{{ Booking[0] }}-year" type="text" value="{{ Booking[25][0:4] }}" placeholder="YYYY">
+            </div>
+            <!-- Error messages -->
+            <h3 id="{{ Booking[0] }}-event-date-error" class="error" style="background-color: white; border: 2px solid black;">Date must be in the form DD MM YYYY and must be in the future</h3>
+            <h3 id="{{ Booking[0] }}-date-unavailable-error" class="error" style="background-color: white; border: 2px solid black;">This date is unavailable</h3>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Start time:</h2>
+                <input id="{{ Booking[0] }}-start-time" type="text" placeholder="HH:MM" value="{{ Booking[7] }}">
+            </div>
+            <!-- Error message -->
+            <h3 id="{{ Booking[0] }}-start-time-error" class="error" style="background-color: white; border: 2px solid black;">Please enter time in the format HH:MM</h3>
+            
+            <div class="edit-details-container">
+                <h2 class="label">End time:</h2>
+                <input id="{{ Booking[0] }}-end-time" type="text" placeholder="HH:MM" value="{{ Booking[8] }}">
+            </div>
+            <!-- Error messages -->
+            <h3 id="{{ Booking[0] }}-end-time-error" class="error" style="background-color: white; border: 2px solid black;">Please enter time in the format HH:MM</h3>
+            <h3 id="{{ Booking[0] }}-end-time-too-early-error" class="error" style="background-color: white; border: 2px solid black;">Event must be at least 30 minutes in length</h3>
+            <h3 id="{{ Booking[0] }}-end-time-too-late-error" class="error" style="background-color: white; border: 2px solid black;">Events can only finish later than 23:00 on Fridays and Saturdays</h3>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Adult guest number:</h2>
+                <input id="{{ Booking[0] }}-adult-number" type="text" value="{{ Booking[9] }}">
+            </div>
+            <!-- Error message -->
+            <h3 id="{{ Booking[0] }}-min-guest-number-error" class="error" style="background-color: white; border: 2px solid black;">Minimum number of adult guests on a Saturday: 80<br>Minimum number of adult guests on all other days: 60</h3>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Child guest number:</h2>
+                <input id="{{ Booking[0] }}-child-number" type="text" value="{{ Booking[10] }}">
+            </div>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Under 2 guest number:</h2>
+                <input id="{{ Booking[0] }}-under2-number" type="text" value="{{ Booking[11] }}">
+            </div>
+            <!-- Error messages -->
+            <h3 id="{{ Booking[0] }}-max-guest-number-error" class="error" style="background-color: white; border: 2px solid black;">Total guest number must be 200 or less</h3>
+            <h3 id="{{ Booking[0] }}-guest-number-type-error" class="error" style="background-color: white; border: 2px solid black;">Please enter a number</h3>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Is a setup day required?</h2>
+                <input id="{{ Booking[0] }}-yes-set-up" onclick="yesPress({{ Booking[0] }}, 'set-up')" type="button" class="yes-no-button" value="Yes" {% if Booking[21] == True %} style="border: 3px solid #42436a; background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% else %} style="background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% endif %}>
+                <input id="{{ Booking[0] }}-no-set-up" onclick="noPress({{ Booking[0] }}, 'set-up')" type="button" class="yes-no-button" value="No" {% if Booking[21] == True %} style="background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% else %} style="border: 3px solid #42436a;  background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% endif %}>
+            </div>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Is the ceremony room required?</h2>
+                <input id="{{ Booking[0] }}-yes-ceremony" onclick="yesPress({{ Booking[0] }}, 'ceremony')" type="button" class="yes-no-button" value="Yes" {% if Booking[16] == True %} style="border: 3px solid #42436a; background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% else %} style="background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% endif %}>
+                <input id="{{ Booking[0] }}-no-ceremony" onclick="noPress({{ Booking[0] }}, 'ceremony')" type="button" class="yes-no-button" value="No" {% if Booking[16] == True %} style="background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% else %} style="border: 3px solid #42436a; background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% endif %}>
+            </div>
+            
+            <div class="edit-details-container" id="{{ Booking[0] }}-ceremony-time-container" {% if Booking[16] == True %} style="display: flex;" {% else %} style="display: none;" {% endif %}>
+                <h2 class="label" style="display: flex;">Ceremoy time:</h2>
+                <input id="{{ Booking[0] }}-ceremony-time" type="text" value="{{ Booking[17] }}" placeholder="HH:MM" style="display: flex;">
+            </div>
+            <!-- Error messages -->
+            <h3 id="{{ Booking[0] }}-ceremony-time-invalid-error" class="error" style="background-color: white; border: 2px solid black;">Please enter time in the format HH:MM</h3>
+            <h3 id="{{ Booking[0] }}-ceremony-time-error" class="error" style="background-color: white; border: 2px solid black;">Ceremony must take place in between the start and end time</h3>
+            
+            <div class="edit-details-container" id="{{ Booking[0] }}-toasting-drinks">
+                <h2 class="label">Are drinks for toasting required?</h2>
+                <input id="{{ Booking[0] }}-yes-toast" onclick="yesPress({{ Booking[0] }}, 'toast')" type="button" class="yes-no-button" value="Yes" {% if Booking[16] == True %} style="border: 3px solid #42436a; background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% else %} style="background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% endif %}>
+                <input id="{{ Booking[0] }}-no-toast" onclick="noPress({{ Booking[0] }}, 'toast')" type="button" class="yes-no-button" value="No" {% if Booking[16] == True %} style="background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% else %} style="border: 3px solid #42436a; background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% endif %}>
+            </div>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Are welcome drinks required?</h2>
+                <input id="{{ Booking[0] }}-yes-welcome" onclick="yesPress({{ Booking[0] }}, 'welcome')" type="button" class="yes-no-button" value="Yes" {% if Booking[16] == True %} style="border: 3px solid #42436a; background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% else %} style="background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% endif %}>
+                <input id="{{ Booking[0] }}-no-welcome" onclick="noPress({{ Booking[0] }}, 'welcome')" type="button" class="yes-no-button" value="No" {% if Booking[16] == True %} style="background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% else %} style="border: 3px solid #42436a; background-color: #E5EFC1; color: #42436a; border-radius: 4px; margin: 0 2% 0 2%;" {% endif %}>
+            </div>
+            
+            <div class="edit-details-container" id="{{ Booking[0] }}-adult-container" {% if Booking[16] == True %} style="display: flex;" {% else %} style="display: none;" {% endif %}>
+                <h2 class="label">Adult's drink:</h2>
+                <input id="{{ Booking[0] }}-adult-drink" type="text" value="{{ Booking[19] }}" style="width: fit-content;">
+            </div>
+            <!-- Error message -->
+            <h3 id="{{ Booking[0] }}-adult-welcome-drink-error" class="error" style="background-color: white; border: 2px solid black;">Drink length must be 1-30 characters</h3>
+            
+            <div class="edit-details-container" id="{{ Booking[0] }}-child-container" {% if Booking[16] == True %} style="display: flex;" {% else %} style="display: none;" {% endif %}>
+                <h2 class="label">Child's drink:</h2>
+                <input id="{{ Booking[0] }}-child-drink" type="text" value="{{ Booking[20] }}" style="width: fit-content;">
+            </div>
+            <!-- Error message -->
+            <h3 id="{{ Booking[0] }}-child-welcome-drink-error" class="error" style="background-color: white; border: 2px solid black;">Drink length must be 1-30 characters</h3>
+            
+            <div class="edit-details-container">
+                <h2 class="label">Notes:</h2>
+                <input id="{{ Booking[0] }}-notes" type="text" value="{{ Booking[22] }}" placeholder="(Optional)" style="width: fit-content;">
+            </div>
+            <!-- Error message -->
+            <h3 id="{{ Booking[0] }}-notes-error" class="error" style="background-color: white; border: 2px solid black;">Character limit: 250</h3>
+            
+            <!-- Buttons to close the edit menu or confirm changes that have been made -->
+            <div class="edit-details-container">
+                <input type="button" value="Close" style="background-color: #E5EFC1; color: #42436a; border: 3px solid #42436a; margin-right: 2%;" onclick="closeConfirm()">
+                <input type="button" value="Save changes" style="background-color: #E5EFC1; color: #f64668; border: 3px solid #42436a; margin-left: 2%;" onclick="validateChanges({{ Booking[0] }})">
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+</div>
+<script>
+    function confirm(action, bookingID) {
+        // The edit and cancel or accept and reject buttons are removed
+        // The confirmation menu for the button that has been pressed is dislpayed for the correct booking
+        let buttons = document.getElementById(`${bookingID}-buttons`);
+        let confirmMenu = document.getElementById(`${bookingID}-${action}-menu`);
+
+        buttons.style.display = 'none';
+        confirmMenu.style.display = 'flex';
+    }
+    
+    function closeConfirm() {
+        // The page is reloaded to close any menus
+        location.reload();
+    }
+    
+    function acceptBooking(bookingID) {
+        // Sends the booking id of the accepted booking to the back end of the system
+        $.ajax({
+            type: "POST",
+            url: "/process-accept-booking-manager",
+            data: {bookingID: bookingID},
+        // Reloads the page when the database has been edited
+        success: function() {
+            closeConfirm();
+        }
+        });
+    }
+    
+    function cancelReason(bookingID) {
+        // The cancellation reason menu is displayed and the confirmation menu is removed
+        let confirmMenu = document.getElementById(`${bookingID}-cancel-menu`);
+        let reasonMenu = document.getElementById(`${bookingID}-cancel-reason`);
+
+        confirmMenu.style.display = 'none';
+        reasonMenu.style.display = 'flex';
+    }
+    
+    function rejectReason(bookingID) {
+        // The rejection reason menu is displayed and the confirmation menu is removed
+        let rejectMenu = document.getElementById(`${bookingID}-reject-menu`);
+        let reasonMenu = document.getElementById(`${bookingID}-reject-reason`);
+
+        rejectMenu.style.display = 'none';
+        reasonMenu.style.display = 'flex';
+    }
+    
+    function cancelBooking(bookingID) {
+        // Retrieves the reason entered
+        let cancellationReason = $(`#${bookingID}-cancellation-reason`).val();
+        let cancellationErrorMessage = document.getElementById(`${bookingID}-cancel-error`);
+        
+        // Validates input and displays error message if necessary
+        if (!(cancellationReason.length < 60 && cancellationReason.length > 4 )) {
+            cancellationErrorMessage.style.display = 'flex'
+            return
+        }
+
+        // Sends the booking id of the cancelled booking to the back end of the system
+        $.ajax({
+            type: "POST",
+            url: "/process-cancel-booking-manager",
+            data: {bookingID: bookingID, 
+                    cancellationReason: cancellationReason},
+        // Reloads the page when the database has been edited
+        success: function() {
+            closeConfirm();
+        }
+        });
+    }
+    
+    function rejectBooking(bookingID) {
+        // Retrieves the reason entered
+        let rejectionReason = $(`#${bookingID}-rejection-reason`).val();
+        let rejectionErrorMessage = document.getElementById(`${bookingID}-reject-error`);
+        // Validates input and displays error message if necessary
+        if (!(rejectionReason.length < 60 && rejectionReason.length > 4 )) {
+            rejectionErrorMessage.style.display = 'flex'
+            return
+        }
+
+        // Sends the booking id of the rejected booking to the back end of the system
+        $.ajax({
+            type: "POST",
+            url: "/process-reject-booking-manager",
+            data: {bookingID: bookingID, 
+                    rejectionReason: rejectionReason},
+        // Reloads the page when the database has been edited
+        success: function() {
+            closeConfirm();
+        }
+        });
+    }
+    
+    function editBooking(bookingID) {
+        // The edit and cancel buttons are removed and the edit menu is displayed
+        let editCancelButtons = document.getElementById(`${bookingID}-buttons`);
+        let editMenu = document.getElementById(`${bookingID}-edit-menu`);
+
+        editCancelButtons.style.display = 'none';
+        editMenu.style.display = 'flex';
+    }
+    
+    function yesPress(bookingID, buttonName) {
+
+        // If one of the yes buttons is pressed, the border around that yes button is added and the border around the no button is removed
+        let yesButton = document.getElementById(`${bookingID}-yes-${buttonName}`);
+        let noButton = document.getElementById(`${bookingID}-no-${buttonName}`);
+
+        yesButton.style.border = '3px solid #42436a';
+        noButton.style.border = 'none';
+
+        // If the yes to ceremony button was pressed, the input for a ceremony time is displayed
+        if (buttonName === 'ceremony') {
+            let timeInput = document.getElementById(`${bookingID}-ceremony-time-container`);
+            timeInput.style.display = 'flex';
+
+        // If the yes to welcome drinks button was pressed, the inputs for adult and child welcome drinks are displayed
+        } else if (buttonName === 'welcome') {
+            let adultInput = document.getElementById(`${bookingID}-adult-container`);
+            let childInput = document.getElementById(`${bookingID}-child-container`);
+            adultInput.style.display = 'flex';
+            childInput.style.display = 'flex';
+        }
+    }
+    
+    function noPress(bookingID, buttonName) {
+
+        // If one of the no buttons is pressed, the border around that no button is added and the border around the yes button is removed
+        let yesButton = document.getElementById(`${bookingID}-yes-${buttonName}`);
+        let noButton = document.getElementById(`${bookingID}-no-${buttonName}`);
+
+        noButton.style.border = '3px solid #42436a';
+        yesButton.style.border = 'none';
+
+        // If the no to ceremony button was pressed, the input for a ceremony time is removed
+        if (buttonName === 'ceremony') {
+            let timeInput = document.getElementById(`${bookingID}-ceremony-time-container`);
+            timeInput.style.display = 'none';
+
+        // If the no to welcome drinks button was pressed, the inputs for adult and child welcome drinks are removed
+        } else if (buttonName === 'welcome') {
+            let adultInput = document.getElementById(`${bookingID}-adult-container`);
+            let childInput = document.getElementById(`${bookingID}-child-container`);
+            adultInput.style.display = 'none';
+            childInput.style.display = 'none';
+        }
+    }
+    
+    function validateChanges(bookingID) {
+
+        // The customer names are retrieved
+        let customer1 = $(`#${bookingID}-customer-name1`).val();
+        let customer2 = $(`#${bookingID}-customer-name2`).val();
+
+        // Error messages are displayed if necessary
+        let customerNameErrorMessage = document.getElementById(`${bookingID}-client-name-error`);
+        try {
+            if (customer1.length < 1 || customer1.length > 60 || customer2.length < 1 || customer2.length > 60) {
+                customerNameErrorMessage.style.display = 'flex';
+                return
+            } else {
+                customerNameErrorMessage.style.display = 'none';
+            }
+        } catch {
+            customer2 = 'null';
+        }
+
+        // The type of event is retrieved
+        let event = $(`#${bookingID}-event`).val();
+
+        // The date of the event is retrieved
+        let day = $(`#${bookingID}-day`).val();
+        let month = $(`#${bookingID}-month`).val();
+        let year = $(`#${bookingID}-year`).val();
+
+        let eventDate = year + "-" + month + "-" + day
+
+        // The start and end time of the event are retrieved
+        let startTime = $(`#${bookingID}-start-time`).val();
+        let endTime = $(`#${bookingID}-end-time`).val();
+
+        // The guest numbers are retrieved
+        let adultNumber = $(`#${bookingID}-adult-number`).val();
+        let childNumber = $(`#${bookingID}-child-number`).val();
+        let under2Number = $(`#${bookingID}-under2-number`).val();
+
+        // The set up requirements are retrieved
+        let setUpRequired;
+        let setUpYesButton = document.getElementById(`${bookingID}-yes-set-up`);
+        if (setUpYesButton.style.border === '3px solid rgb(66, 67, 106)') {
+            setUpRequired = true;
+        } else {
+            setUpRequired = false;
+        }
+
+        // The ceremony requirements are retrieved
+        let ceremonyRequired;
+        let ceremonyYesButton = document.getElementById(`${bookingID}-yes-ceremony`);
+        if (ceremonyYesButton.style.border === '3px solid rgb(66, 67, 106)') {
+            ceremonyRequired = true;
+        } else {
+            ceremonyRequired = false;
+        }
+
+        // The ceremony time is retrieved
+        let ceremonyTime = $(`#${bookingID}-ceremony-time`).val();
+
+        // The toasting drink requirements are retrieved
+        let toastRequired;
+        let toastYesButton = document.getElementById(`${bookingID}-yes-toast`);
+        if (toastYesButton.style.border === '3px solid rgb(66, 67, 106)') {
+            toastRequired = true;
+        } else {
+            toastRequired = false;
+        }
+
+        // The welcome drink requirements are retrieved
+        let welcomeRequired;
+        let welcomeYesButton = document.getElementById(`${bookingID}-yes-welcome`);
+        if (welcomeYesButton.style.border === '3px solid rgb(66, 67, 106)') {
+            welcomeRequired = true;
+        } else {
+            welcomeRequired = false;
+        }
+
+        // The adult and child drinks are retrieved
+        let adultDrink = $(`#${bookingID}-adult-drink`).val();
+        let childDrink = $(`#${bookingID}-child-drink`).val();
+
+        // Error messages are displayed if necessary
+        drinkError = document.getElementById(`${bookingID}-child-welcome-drink-error`);
+        if (welcomeRequired && (adultDrink.length < 1 || adultDrink.length > 30 || childDrink.length < 1 || childDrink.length > 30)){
+            drinkError.style.display = 'flex'
+            return
+        }
+
+        // The package option is retrieved and an error message is displayed if necessary
+        let packageOption = $(`#${bookingID}-package`).val();
+        let packageErrorMessage = document.getElementById(`${bookingID}-package-error`);
+        try {
+            if (['1', '2', '3'].includes(packageOption)) {
+                packageErrorMessage.style.display = 'none';
+            } else {
+                packageErrorMessage.style.display = 'flex';
+                return
+            }
+        } catch {
+            packageOption = 'null';
+        }
+
+        // The event notes are retrieved
+        let notes = $(`#${bookingID}-notes`).val();
+
+        // Data is sent to the back end to be validated
+        $.ajax({
+            type: "POST",
+            url: "/process-edit-booking",
+            data: {bookingID: bookingID,
+                customer1: customer1,
+                customer2: customer2,
+                event: event, 
+                eventDate: eventDate,
+                startTime: startTime, 
+                endTime: endTime, 
+                setUpRequired: setUpRequired, 
+                ceremonyRequired: ceremonyRequired, 
+                ceremonyTime: ceremonyTime, 
+                adultNumber: adultNumber, 
+                childNumber: childNumber, 
+                under2Number: under2Number,
+                toastRequired: toastRequired,
+                welcomeRequired: welcomeRequired, 
+                adultDrink: adultDrink, 
+                childDrink: childDrink,
+                notes: notes,
+                packageOption: packageOption},
+            success: function(response) {
+
+                // If the data was all valid, it has been edited and the menu is closed
+                if (response.status === 'success') {
+                    closeConfirm()
+
+                // Otherwise, a function to display error messages is called with the array of errors that has been returned
+                } else {
+                    handleInvalidData(response.errors, bookingID);
+                }
+            }
+        });
+    }
+
+    function toggleSearchMenu() {
+
+        // When the search button is pressed, the search menu is displayed
+        let searchMenu = document.getElementById('search-menu');
+
+        if (searchMenu.style.display === 'none') {
+            searchMenu.style.display = 'flex';
+
+        // If the search menu is already being displayed, it is now removed
+        } else {
+            searchMenu.style.display = 'none';
+        }
+    }
+
+    function nameSearch() {
+
+        // The names that the user has entered is retrieved and converted to lowercase
+        let nameInput = document.getElementById('name-search').value.toLowerCase();
+        let customerBoxes = document.querySelectorAll('.booking-box');
+
+        // Found is initialised as false until at least one booking has been found
+        let found = false;
+
+        // All booking boxes are checked to see if the match the search criteria
+        customerBoxes.forEach(function (customerBox) {
+            let customerName = customerBox.querySelector('.customer-name').textContent.toLowerCase();
+
+            if (customerName.includes(nameInput)) {
+                customerBox.style.display = 'flex';
+                found = true;
+
+            // If they do not match the search criteria, they are no longer displayed
+            } else {
+                customerBox.style.display = 'none';
+            }
+        });
+
+        // An error message is displayed if no bookings were found matching the search criteria
+        let error = document.getElementById('error');
+        if (!(found)) {
+            error.style.display = 'flex';
+        } else {
+            error.style.display = 'none';
+        }
+    }
+
+    function dateSearch() {
+
+        // The day, month and year inputs are retrieved and concatenated to form the date
+        let day = document.getElementById('date-day').value;
+        let month = document.getElementById('date-month').value;
+        let year = document.getElementById('date-year').value;
+        let dateInput = year + "-" + month + "-" + day;
+        let customerBoxes = document.querySelectorAll('.booking-box');
+
+        // Found is initialised as false until at least one booking has been found
+        let found = false;
+
+        // All booking boxes are checked to see if the match the search criteria
+        customerBoxes.forEach(function (customerBox) {
+            let bookingDate = customerBox.querySelector('.booking-date').textContent;
+
+            if (bookingDate === dateInput) {
+                customerBox.style.display = 'flex';
+                found = true;
+
+            // If they do not match the search criteria, they are no longer displayed
+            } else {
+                customerBox.style.display = 'none';
+            }
+        });
+
+        // An error message is displayed if no bookings were found matching the search criteria
+        let error = document.getElementById('error');
+        if (!(found)) {
+            error.style.display = 'flex';
+        } else {
+            error.style.display = 'none';
+        }
+    }
+
+    function guestNumberSearch() {
+
+        // guest number input is retrieved
+        let guestNumberInput = document.getElementById('guest-number').value;
+        let customerBoxes = document.querySelectorAll('.booking-box');
+
+        // Found is initialised as false until at least one booking has been found
+        let found = false;
+
+        // All booking boxes are checked to see if the match the search criteria
+        customerBoxes.forEach(function (customerBox) {
+            let guestNumber = customerBox.querySelector('.adult-guest-number').textContent;
+
+            if (guestNumber === guestNumberInput) {
+                customerBox.style.display = 'flex';
+                found = true;
+
+            // If they do not match the search criteria, they are no longer displayed
+            } else {
+                customerBox.style.display = 'none';
+            }
+        });
+
+        // An error message is displayed if no bookings were found matching the search criteria
+        let error = document.getElementById('error');
+        if (!(found)) {
+            error.style.display = 'flex';
+        } else {
+            error.style.display = 'none';
+        }
+    }
+
+    // Displays the approproate error messages based on the errors returned from the validation routine
+    function handleInvalidData(errors, bookingID) {
+
+        // Checks if each error is present in the errors array
+        // If so, the appropriate error message is displayed
+
+        invalidEventError = document.getElementById(`${bookingID}-invalid-event-error`);
+        if (errors.includes("InvalidEvent")) {
+            invalidEventError.style.display = 'flex';
+        } else {
+            invalidEventError.style.display = 'none';
+        }
+
+        eventDateError = document.getElementById(`${bookingID}-event-date-error`);
+        if (errors.includes("EventDate")) {
+            eventDateError.style.display = 'flex';
+        } else {
+            eventDateError.style.display = 'none';
+        }
+
+        unavailableDateError = document.getElementById(`${bookingID}-date-unavailable-error`)
+        if (errors.includes("UnavailableDate")) {
+            unavailableDateError.style.display = 'flex';
+        } else {
+            unavailableDateError.style.display = 'none';
+        }
+
+        startTimeError = document.getElementById(`${bookingID}-start-time-error`);
+        if (errors.includes("StartTime")) {
+            startTimeError.style.display = 'flex';
+        } else {
+            startTimeError.style.display = 'none';
+        }
+
+        endTimeError = document.getElementById(`${bookingID}-end-time-error`);
+        if (errors.includes("EndTime")) {
+            endTimeError.style.display = 'flex';
+        } else {
+            endTimeError.style.display = 'none';
+        }
+
+        endTimeTooEarlyError = document.getElementById(`${bookingID}-end-time-too-early-error`);
+        if (errors.includes("EndTimeTooEarly")) {
+            endTimeTooEarlyError.style.display = 'flex';
+        } else {
+            endTimeTooEarlyError.style.display = 'none';
+        }
+
+        endTimeTooLateError = document.getElementById(`${bookingID}-end-time-too-late-error`);
+        if (errors.includes("EndTimeTooLate")) {
+            endTimeTooLateError.style.display = 'flex';
+        } else {
+            endTimeTooLateError.style.display = 'none';
+        }
+
+        ceremonyTimeError = document.getElementById(`${bookingID}-ceremony-time-error`);
+        if (errors.includes("CeremonyTime")) {
+            ceremonyTimeError.style.display = 'flex';
+        } else {
+            ceremonyTimeError.style.display = 'none';
+        }
+
+        ceremonyTimeInvalidError = document.getElementById(`${bookingID}-ceremony-time-invalid-error`);
+        if (errors.includes("CeremonyTimeInvalid")) {
+            ceremonyTimeInvalidError.style.display = 'flex';
+        } else {
+            ceremonyTimeInvalidError.style.display = 'none';
+        }
+
+        minGuestNumberError = document.getElementById(`${bookingID}-min-guest-number-error`);
+        if (errors.includes("MinGuestNumber")) {
+            minGuestNumberError.style.display = 'flex';
+        } else {
+            minGuestNumberError.style.display = 'none';
+        }
+
+        maxGuestNumberError = document.getElementById(`${bookingID}-max-guest-number-error`);
+        if (errors.includes("MaxGuestNumber")) {
+            maxGuestNumberError.style.display = 'flex';
+        } else {
+            maxGuestNumberError.style.display = 'none';
+        }
+
+        guestNumberTypeError = document.getElementById(`${bookingID}-guest-number-type-error`);
+        if (errors.includes("GuestNumberType")) {
+            guestNumberTypeError.style.display = 'flex';
+        } else {
+            guestNumberTypeError.style.display = 'none';
+        }
+
+        notesError = document.getElementById(`${bookingID}-notes-error`);
+        if (errors.includes("Notes")) {
+            notesError.style.display = 'flex';
+        } else {
+            notesError.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

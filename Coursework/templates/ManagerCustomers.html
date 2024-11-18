@@ -1,0 +1,237 @@
+{% extends "BaseManagerNavBar.html" %}
+{% block title %}<title>Customers</title>{% endblock %}
+{% block contents %}
+<style>
+    .container {
+        margin-left: 15%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Tahoma;
+        color: #E5EFC1;
+        text-align: center;
+    }
+    .divider {
+        border-right: 2px solid #41436A; 
+        height: 100%;
+        margin: auto 10px;
+    }
+    .book-button-container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40%;
+        flex-direction: column;
+        background-color: #E5EFC1;
+        border-radius: 4px;
+        margin-bottom: 3%;
+    }
+    .book-button {
+        background-color: #E5EFC1;
+        color: #42436a;
+        border: none;
+        font-family: Tahoma;
+        margin: 2%;
+        width: 100%;
+        height: 50px;
+        font-weight: 700;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .customer-box {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: #f64668;
+        color: #E5EFC1;
+        border-radius: 12px;
+        width: 95%;
+        text-align: left;
+        padding-left: 2%;
+        margin-bottom: 2%;
+        font-size: x-small;
+    }
+    .horizontal-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+    input[type=text] {
+        background-color: #42436a;
+        color: #E5EFC1;
+        border: none;
+        padding: 5%;
+        border-radius: 3px;
+        margin: 3%;
+        width: fit-content;
+    }
+    input[type=submit] {
+        background-color: #42436a;
+        color: #E5EFC1;
+        font-family: Tahoma;
+        border: none;
+        border-radius: 3px;
+        padding: 3%;
+        font-size: large;
+        cursor: pointer;
+    }
+    .search-menu {
+        display: none;
+        flex-direction: column;
+        padding-bottom: 3%;
+    }
+</style>
+<div class="container">
+    <h1 style="margin-top: 2%; margin-left: -4%;">Customers</h1>
+
+    <div class="book-button-container">
+
+        <!-- Search menu -->
+        <button class="book-button" onclick="toggleSearchMenu()">Search Customers</button>
+        <div class="search-menu" id="search-menu">
+            <div class="horizontal-container" style=>
+                <input type="text" placeholder="Customer's name" id="name-search">
+                <input type="submit" value="Search" onclick="nameSearch()">
+            </div>
+            <div class="horizontal-container">
+                <input type="text" placeholder="Customer's phone number" id="phone-search">
+                <input type="submit" value="Search" onclick="phoneSearch()">
+            </div>
+            <div class="horizontal-container">
+                <input type="text" placeholder="Customer's email address" id="email-search">
+                <input type="submit" value="Search" onclick="emailSearch()">
+            </div>
+            <!-- Error message -->
+            <h5 id="error" style="color: #f64668; display: none;">No customers found matching this criteria</h5>
+        </div>
+    </div>
+
+    <!-- A customer box is created for each customer -->
+    {% for Customer in CustomerArray %}
+    <div class="customer-box" id="{{ Customer[0] }}">
+
+        <!-- The customer's first and last name are displayed -->
+        <h1 class="customer-name" style="padding: 0% 5%; width: 33%;">{{ Customer[1] }} {{ Customer[2] }}</h1>
+
+        <!-- The customer's phone numer is displayed -->
+        <h1 class="customer-phone" style="padding: 0% 5%; width: 33%;">{{ Customer[4] }}</h1>
+
+        <!-- The customer's email address is displayed -->
+        <h1 class="customer-email" style="padding: 0% 5%; width: 33%;">{{ Customer[3] }}</h1>
+    </div>
+    {% endfor %}
+</div>
+<script>
+    function nameSearch() {
+
+        // The names that the user has entered is retrieved and converted to lowercase
+        let nameInput = document.getElementById('name-search').value.toLowerCase();
+        let customerBoxes = document.querySelectorAll('.customer-box');
+
+        // Found is initialised as false until at least one customer has been found
+        let found = false;
+
+        // All customer boxes are checked to see if the match the search criteria
+        customerBoxes.forEach(function (customerBox) {
+            let customerName = customerBox.querySelector('.customer-name').textContent.toLowerCase();
+
+            if (customerName.includes(nameInput)) {
+                customerBox.style.display = 'flex';
+                found = true;
+
+            // If they do not match the search criteria, they are no longer displayed
+            } else {
+                customerBox.style.display = 'none';
+            }
+        });
+
+        // An error message is displayed if no customers were found matching the search criteria
+        let error = document.getElementById('error');
+        if (!(found)) {
+            error.style.display = 'flex';
+        } else {
+            error.style.display = 'none';
+        }
+    }
+
+    function phoneSearch() {
+
+        // The phone number that has been entered is retrieved
+        let phoneInput = document.getElementById('phone-search').value.toLowerCase();
+        let customerBoxes = document.querySelectorAll('.customer-box');
+
+        // Found is initialised as false until at least one customer has been found
+        let found = false;
+
+        // All customer boxes are checked to see if the match the search criteria
+        customerBoxes.forEach(function (customerBox) {
+            let customerName = customerBox.querySelector('.customer-phone').textContent.toLowerCase();
+
+            if (customerName.includes(phoneInput)) {
+                customerBox.style.display = 'flex';
+                found = true;
+
+            // If they do not match the search criteria, they are no longer displayed
+            } else {
+                customerBox.style.display = 'none';
+            }
+        });
+
+        // An error message is displayed if no customers were found matching the search criteria
+        let error = document.getElementById('error');
+        if (!(found)) {
+            error.style.display = 'flex';
+        } else {
+            error.style.display = 'none';
+        }
+    }
+
+    function emailSearch() {
+
+        // The email that the user has entered is retrieved and converted to lowercase
+        let emailInput = document.getElementById('email-search').value.toLowerCase();
+        let customerBoxes = document.querySelectorAll('.customer-box');
+
+        // Found is initialised as false until at least one customer has been found
+        let found = false;
+
+        // All customer boxes are checked to see if the match the search criteria
+        customerBoxes.forEach(function (customerBox) {
+            let customerName = customerBox.querySelector('.customer-email').textContent.toLowerCase();
+
+            if (customerName.includes(emailInput)) {
+                customerBox.style.display = 'flex';
+                found = true;
+
+            // If they do not match the search criteria, they are no longer displayed
+            } else {
+                customerBox.style.display = 'none';
+            }
+        });
+
+        // An error message is displayed if no customers were found matching the search criteria
+        let error = document.getElementById('error');
+        if (!(found)) {
+            error.style.display = 'flex';
+        } else {
+            error.style.display = 'none';
+        }
+    }
+
+    function toggleSearchMenu() {
+
+        // When the search button is pressed, the search menu is displayed
+        let searchMenu = document.getElementById('search-menu');
+
+        if (searchMenu.style.display === 'none') {
+            searchMenu.style.display = 'flex';
+
+        // If the search menu is already being displayed, it is now removed
+        } else {
+            searchMenu.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

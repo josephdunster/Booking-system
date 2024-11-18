@@ -1,0 +1,1232 @@
+{% extends "BaseManagerNavBar.html" %}
+{% block title %}<title>Calendar</title>{% endblock %}
+{% block contents %}
+<style>
+    .container {
+        margin-left: 15%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Tahoma;
+        color: #E5EFC1;
+        text-align: center;
+        height: 10%;
+    }
+    .calendar-container {
+        height: 90%;
+        width: 100%;
+    }
+    .book-button-container{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    .book-button {
+        background-color: #E5EFC1;
+        color: #42436a;
+        border: none;
+        font-family: Tahoma;
+        margin: 2%;
+        width: 40%;
+        height: 50px;
+        font-weight: 700;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    select {
+        background-color: #E5EFC1;
+        color: #42436a;
+        border: none;
+        font-family: Tahoma;
+        margin: 2%;
+        width: 40%;
+        height: 50px;
+        font-weight: 700;
+        border-radius: 4px;
+        text-align: center;
+    }
+    .right-arrow-button {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 20px 0 20px 30px;
+      border-color: transparent transparent transparent #E5EFC1;
+      background-color: #42436a;
+      cursor: pointer;
+      margin-left: 5%;
+      margin-right: 5%;
+    }
+    .left-arrow-button {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 20px 30px 20px 0;
+      border-color: transparent #E5EFC1 transparent transparent;
+      background-color: #42436a;
+      cursor: pointer;
+      margin-left: 5%;
+      margin-right: 5%;
+    }
+    .horizontal-container {
+        display: flex;
+        flex-direction: row;
+    }
+    .year-calendar {
+        display: grid;
+        grid-template-columns: repeat(13, 1fr);
+        gap: 3px;
+        padding: 20px;
+        width: 100%;
+        margin-left: -3%;
+    }
+    .month-calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        gap: 3px;
+        padding: 20px;
+        width: 95%;
+        height: 90vh;
+        margin-right: 2%;
+        margin-left: 2%;
+    }
+    .week-calendar {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(32, 1fr);
+        gap: 1px;
+        padding: 20px;
+        width: 100%;
+        height: 83vh;
+        margin-right: 2%;
+        margin-left: -6%;
+    }
+    .grid {
+        background-color: white;
+        color: #42436a;
+        width: 100%;
+        font-family: Tahoma;
+        font-weight: 800;
+    }
+    .grid-month {
+        display: flex;
+        background-color: white;
+        color: #42436a;
+        width: 100%;
+        font-family: Tahoma;
+        font-weight: 800;
+        font-size: medium;
+        height: 100%;
+        text-align: left;
+    }
+    .grid-week {
+        display: flex;
+        background-color: white;
+        color: #Efe5c1;
+        width: 100%;
+        font-family: Tahoma;
+        font-weight: 800;
+        font-size: medium;
+        justify-content: center;
+        height: 100%;
+    }
+    .arrow-buttons {
+        border: none;
+        background-color: #42436a;
+    }
+    .details-menu {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: left;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #42436a;
+        color: #E5EFC1;
+        border: 4px solid black;
+        width: 35%;
+        height: fit-content;
+        z-index: 999;
+        margin-left: 5%;
+        padding-right: 1%;
+        padding-left: 1%;
+    }
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+    }
+    h3 {
+        margin: 1.5%;
+    }
+</style>
+<div class="container">
+    <div class="book-button-container">
+
+        <!-- The timeframe and left and right arrow buttons -->
+        <form method="post" name="add-subtract" style="display: flex; flex-direction: row; width: 60%; margin-left: 5%;">
+            <button class="arrow-buttons" type="submit" name="subtract"><div class="left-arrow-button"></div></button>
+            <h2 style="width: 80%;">{{ Timeframe }}</h2>
+            <button class="arrow-buttons" type="submit" name="add"><div class="right-arrow-button"></div></button>
+        </form>
+
+        <!-- The change view form -->
+        <form method="post" style="width: 100%;" id="view-form">
+            <select id="view-select" name="view-select">
+                <option>Change view</option>
+                <option value="Year">Year</option>
+                <option value="Month">Month</option>
+                <option value="Week">Week</option>
+            </select>
+        </form>
+
+        <script>
+            // The view select form is submitted whenever the view is changed
+            const form = document.getElementById('view-form');
+            const select = document.getElementById('view-select');
+
+            select.addEventListener('change', () => {
+                form.submit();
+            });
+        </script>
+
+    </div>
+    <div class="calendar-container">
+
+        <!-- The year calendar is displayed if the current view is year -->
+        {% if View == 'Year' %}
+        <div class="year-calendar" id="year-calendar">
+            <div class="grid" style="width: 30%; margin-left: 70%;"></div>
+            <div class="grid">Jan</div>
+            <div class="grid">Feb</div>
+            <div class="grid">Mar</div>
+            <div class="grid">Apr</div>
+            <div class="grid">May</div>
+            <div class="grid">Jun</div>
+            <div class="grid">Jul</div>
+            <div class="grid">Aug</div>
+            <div class="grid">Sep</div>
+            <div class="grid">Oct</div>
+            <div class="grid">Nov</div>
+            <div class="grid">Dec</div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">1</div>
+            <div class="grid" id="01-01"></div>
+            <div class="grid" id="02-01"></div>
+            <div class="grid" id="03-01"></div>
+            <div class="grid" id="04-01"></div>
+            <div class="grid" id="05-01"></div>
+            <div class="grid" id="06-01"></div>
+            <div class="grid" id="07-01"></div>
+            <div class="grid" id="08-01"></div>
+            <div class="grid" id="09-01"></div>
+            <div class="grid" id="10-01"></div>
+            <div class="grid" id="11-01"></div>
+            <div class="grid" id="12-01"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">2</div>
+            <div class="grid" id="01-02"></div>
+            <div class="grid" id="02-02"></div>
+            <div class="grid" id="03-02"></div>
+            <div class="grid" id="04-02"></div>
+            <div class="grid" id="05-02"></div>
+            <div class="grid" id="06-02"></div>
+            <div class="grid" id="07-02"></div>
+            <div class="grid" id="08-02"></div>
+            <div class="grid" id="09-02"></div>
+            <div class="grid" id="10-02"></div>
+            <div class="grid" id="11-02"></div>
+            <div class="grid" id="12-02"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">3</div>
+            <div class="grid" id="01-03"></div>
+            <div class="grid" id="02-03"></div>
+            <div class="grid" id="03-03"></div>
+            <div class="grid" id="04-03"></div>
+            <div class="grid" id="05-03"></div>
+            <div class="grid" id="06-03"></div>
+            <div class="grid" id="07-03"></div>
+            <div class="grid" id="08-03"></div>
+            <div class="grid" id="09-03"></div>
+            <div class="grid" id="10-03"></div>
+            <div class="grid" id="11-03"></div>
+            <div class="grid" id="12-03"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">4</div>
+            <div class="grid" id="01-04"></div>
+            <div class="grid" id="02-04"></div>
+            <div class="grid" id="03-04"></div>
+            <div class="grid" id="04-04"></div>
+            <div class="grid" id="05-04"></div>
+            <div class="grid" id="06-04"></div>
+            <div class="grid" id="07-04"></div>
+            <div class="grid" id="08-04"></div>
+            <div class="grid" id="09-04"></div>
+            <div class="grid" id="10-04"></div>
+            <div class="grid" id="11-04"></div>
+            <div class="grid" id="12-04"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">5</div>
+            <div class="grid" id="01-05"></div>
+            <div class="grid" id="02-05"></div>
+            <div class="grid" id="03-05"></div>
+            <div class="grid" id="04-05"></div>
+            <div class="grid" id="05-05"></div>
+            <div class="grid" id="06-05"></div>
+            <div class="grid" id="07-05"></div>
+            <div class="grid" id="08-05"></div>
+            <div class="grid" id="09-05"></div>
+            <div class="grid" id="10-05"></div>
+            <div class="grid" id="11-05"></div>
+            <div class="grid" id="12-05"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">6</div>
+            <div class="grid" id="01-06"></div>
+            <div class="grid" id="02-06"></div>
+            <div class="grid" id="03-06"></div>
+            <div class="grid" id="04-06"></div>
+            <div class="grid" id="05-06"></div>
+            <div class="grid" id="06-06"></div>
+            <div class="grid" id="07-06"></div>
+            <div class="grid" id="08-06"></div>
+            <div class="grid" id="09-06"></div>
+            <div class="grid" id="10-06"></div>
+            <div class="grid" id="11-06"></div>
+            <div class="grid" id="12-06"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">7</div>
+            <div class="grid" id="01-07"></div>
+            <div class="grid" id="02-07"></div>
+            <div class="grid" id="03-07"></div>
+            <div class="grid" id="04-07"></div>
+            <div class="grid" id="05-07"></div>
+            <div class="grid" id="06-07"></div>
+            <div class="grid" id="07-07"></div>
+            <div class="grid" id="08-07"></div>
+            <div class="grid" id="09-07"></div>
+            <div class="grid" id="10-07"></div>
+            <div class="grid" id="11-07"></div>
+            <div class="grid" id="12-07"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">8</div>
+            <div class="grid" id="01-08"></div>
+            <div class="grid" id="02-08"></div>
+            <div class="grid" id="03-08"></div>
+            <div class="grid" id="04-08"></div>
+            <div class="grid" id="05-08"></div>
+            <div class="grid" id="06-08"></div>
+            <div class="grid" id="07-08"></div>
+            <div class="grid" id="08-08"></div>
+            <div class="grid" id="09-08"></div>
+            <div class="grid" id="10-08"></div>
+            <div class="grid" id="11-08"></div>
+            <div class="grid" id="12-08"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">9</div>
+            <div class="grid" id="01-09"></div>
+            <div class="grid" id="02-09"></div>
+            <div class="grid" id="03-09"></div>
+            <div class="grid" id="04-09"></div>
+            <div class="grid" id="05-09"></div>
+            <div class="grid" id="06-09"></div>
+            <div class="grid" id="07-09"></div>
+            <div class="grid" id="08-09"></div>
+            <div class="grid" id="09-09"></div>
+            <div class="grid" id="10-09"></div>
+            <div class="grid" id="11-09"></div>
+            <div class="grid" id="12-09"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">10</div>
+            <div class="grid" id="01-10"></div>
+            <div class="grid" id="02-10"></div>
+            <div class="grid" id="03-10"></div>
+            <div class="grid" id="04-10"></div>
+            <div class="grid" id="05-10"></div>
+            <div class="grid" id="06-10"></div>
+            <div class="grid" id="07-10"></div>
+            <div class="grid" id="08-10"></div>
+            <div class="grid" id="09-10"></div>
+            <div class="grid" id="10-10"></div>
+            <div class="grid" id="11-10"></div>
+            <div class="grid" id="12-10"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">11</div>
+            <div class="grid" id="01-11"></div>
+            <div class="grid" id="02-11"></div>
+            <div class="grid" id="03-11"></div>
+            <div class="grid" id="04-11"></div>
+            <div class="grid" id="05-11"></div>
+            <div class="grid" id="06-11"></div>
+            <div class="grid" id="07-11"></div>
+            <div class="grid" id="08-11"></div>
+            <div class="grid" id="09-11"></div>
+            <div class="grid" id="10-11"></div>
+            <div class="grid" id="11-11"></div>
+            <div class="grid" id="12-11"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">12</div>
+            <div class="grid" id="01-12"></div>
+            <div class="grid" id="02-12"></div>
+            <div class="grid" id="03-12"></div>
+            <div class="grid" id="04-12"></div>
+            <div class="grid" id="05-12"></div>
+            <div class="grid" id="06-12"></div>
+            <div class="grid" id="07-12"></div>
+            <div class="grid" id="08-12"></div>
+            <div class="grid" id="09-12"></div>
+            <div class="grid" id="10-12"></div>
+            <div class="grid" id="11-12"></div>
+            <div class="grid" id="12-12"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">13</div>
+            <div class="grid" id="01-13"></div>
+            <div class="grid" id="02-13"></div>
+            <div class="grid" id="03-13"></div>
+            <div class="grid" id="04-13"></div>
+            <div class="grid" id="05-13"></div>
+            <div class="grid" id="06-13"></div>
+            <div class="grid" id="07-13"></div>
+            <div class="grid" id="08-13"></div>
+            <div class="grid" id="09-13"></div>
+            <div class="grid" id="10-13"></div>
+            <div class="grid" id="11-13"></div>
+            <div class="grid" id="12-13"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">14</div>
+            <div class="grid" id="01-14"></div>
+            <div class="grid" id="02-14"></div>
+            <div class="grid" id="03-14"></div>
+            <div class="grid" id="04-14"></div>
+            <div class="grid" id="05-14"></div>
+            <div class="grid" id="06-14"></div>
+            <div class="grid" id="07-14"></div>
+            <div class="grid" id="08-14"></div>
+            <div class="grid" id="09-14"></div>
+            <div class="grid" id="10-14"></div>
+            <div class="grid" id="11-14"></div>
+            <div class="grid" id="12-14"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">15</div>
+            <div class="grid" id="01-15"></div>
+            <div class="grid" id="02-15"></div>
+            <div class="grid" id="03-15"></div>
+            <div class="grid" id="04-15"></div>
+            <div class="grid" id="05-15"></div>
+            <div class="grid" id="06-15"></div>
+            <div class="grid" id="07-15"></div>
+            <div class="grid" id="08-15"></div>
+            <div class="grid" id="09-15"></div>
+            <div class="grid" id="10-15"></div>
+            <div class="grid" id="11-15"></div>
+            <div class="grid" id="12-15"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">16</div>
+            <div class="grid" id="01-16"></div>
+            <div class="grid" id="02-16"></div>
+            <div class="grid" id="03-16"></div>
+            <div class="grid" id="04-16"></div>
+            <div class="grid" id="05-16"></div>
+            <div class="grid" id="06-16"></div>
+            <div class="grid" id="07-16"></div>
+            <div class="grid" id="08-16"></div>
+            <div class="grid" id="09-16"></div>
+            <div class="grid" id="10-16"></div>
+            <div class="grid" id="11-16"></div>
+            <div class="grid" id="12-16"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">17</div>
+            <div class="grid" id="01-17"></div>
+            <div class="grid" id="02-17"></div>
+            <div class="grid" id="03-17"></div>
+            <div class="grid" id="04-17"></div>
+            <div class="grid" id="05-17"></div>
+            <div class="grid" id="06-17"></div>
+            <div class="grid" id="07-17"></div>
+            <div class="grid" id="08-17"></div>
+            <div class="grid" id="09-17"></div>
+            <div class="grid" id="10-17"></div>
+            <div class="grid" id="11-17"></div>
+            <div class="grid" id="12-17"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">18</div>
+            <div class="grid" id="01-18"></div>
+            <div class="grid" id="02-18"></div>
+            <div class="grid" id="03-18"></div>
+            <div class="grid" id="04-18"></div>
+            <div class="grid" id="05-18"></div>
+            <div class="grid" id="06-18"></div>
+            <div class="grid" id="07-18"></div>
+            <div class="grid" id="08-18"></div>
+            <div class="grid" id="09-18"></div>
+            <div class="grid" id="10-18"></div>
+            <div class="grid" id="11-18"></div>
+            <div class="grid" id="12-18"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">19</div>
+            <div class="grid" id="01-19"></div>
+            <div class="grid" id="02-19"></div>
+            <div class="grid" id="03-19"></div>
+            <div class="grid" id="04-19"></div>
+            <div class="grid" id="05-19"></div>
+            <div class="grid" id="06-19"></div>
+            <div class="grid" id="07-19"></div>
+            <div class="grid" id="08-19"></div>
+            <div class="grid" id="09-19"></div>
+            <div class="grid" id="10-19"></div>
+            <div class="grid" id="11-19"></div>
+            <div class="grid" id="12-19"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">20</div>
+            <div class="grid" id="01-20"></div>
+            <div class="grid" id="02-20"></div>
+            <div class="grid" id="03-20"></div>
+            <div class="grid" id="04-20"></div>
+            <div class="grid" id="05-20"></div>
+            <div class="grid" id="06-20"></div>
+            <div class="grid" id="07-20"></div>
+            <div class="grid" id="08-20"></div>
+            <div class="grid" id="09-20"></div>
+            <div class="grid" id="10-20"></div>
+            <div class="grid" id="11-20"></div>
+            <div class="grid" id="12-20"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">21</div>
+            <div class="grid" id="01-21"></div>
+            <div class="grid" id="02-21"></div>
+            <div class="grid" id="03-21"></div>
+            <div class="grid" id="04-21"></div>
+            <div class="grid" id="05-21"></div>
+            <div class="grid" id="06-21"></div>
+            <div class="grid" id="07-21"></div>
+            <div class="grid" id="08-21"></div>
+            <div class="grid" id="09-21"></div>
+            <div class="grid" id="10-21"></div>
+            <div class="grid" id="11-21"></div>
+            <div class="grid" id="12-21"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">22</div>
+            <div class="grid" id="01-22"></div>
+            <div class="grid" id="02-22"></div>
+            <div class="grid" id="03-22"></div>
+            <div class="grid" id="04-22"></div>
+            <div class="grid" id="05-22"></div>
+            <div class="grid" id="06-22"></div>
+            <div class="grid" id="07-22"></div>
+            <div class="grid" id="08-22"></div>
+            <div class="grid" id="09-22"></div>
+            <div class="grid" id="10-22"></div>
+            <div class="grid" id="11-22"></div>
+            <div class="grid" id="12-22"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">23</div>
+            <div class="grid" id="01-23"></div>
+            <div class="grid" id="02-23"></div>
+            <div class="grid" id="03-23"></div>
+            <div class="grid" id="04-23"></div>
+            <div class="grid" id="05-23"></div>
+            <div class="grid" id="06-23"></div>
+            <div class="grid" id="07-23"></div>
+            <div class="grid" id="08-23"></div>
+            <div class="grid" id="09-23"></div>
+            <div class="grid" id="10-23"></div>
+            <div class="grid" id="11-23"></div>
+            <div class="grid" id="12-23"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">24</div>
+            <div class="grid" id="01-24"></div>
+            <div class="grid" id="02-24"></div>
+            <div class="grid" id="03-24"></div>
+            <div class="grid" id="04-24"></div>
+            <div class="grid" id="05-24"></div>
+            <div class="grid" id="06-24"></div>
+            <div class="grid" id="07-24"></div>
+            <div class="grid" id="08-24"></div>
+            <div class="grid" id="09-24"></div>
+            <div class="grid" id="10-24"></div>
+            <div class="grid" id="11-24"></div>
+            <div class="grid" id="12-24"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">25</div>
+            <div class="grid" id="01-25"></div>
+            <div class="grid" id="02-25"></div>
+            <div class="grid" id="03-25"></div>
+            <div class="grid" id="04-25"></div>
+            <div class="grid" id="05-25"></div>
+            <div class="grid" id="06-25"></div>
+            <div class="grid" id="07-25"></div>
+            <div class="grid" id="08-25"></div>
+            <div class="grid" id="09-25"></div>
+            <div class="grid" id="10-25"></div>
+            <div class="grid" id="11-25"></div>
+            <div class="grid" id="12-25"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">26</div>
+            <div class="grid" id="01-26"></div>
+            <div class="grid" id="02-26"></div>
+            <div class="grid" id="03-26"></div>
+            <div class="grid" id="04-26"></div>
+            <div class="grid" id="05-26"></div>
+            <div class="grid" id="06-26"></div>
+            <div class="grid" id="07-26"></div>
+            <div class="grid" id="08-26"></div>
+            <div class="grid" id="09-26"></div>
+            <div class="grid" id="10-26"></div>
+            <div class="grid" id="11-26"></div>
+            <div class="grid" id="12-26"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">27</div>
+            <div class="grid" id="01-27"></div>
+            <div class="grid" id="02-27"></div>
+            <div class="grid" id="03-27"></div>
+            <div class="grid" id="04-27"></div>
+            <div class="grid" id="05-27"></div>
+            <div class="grid" id="06-27"></div>
+            <div class="grid" id="07-27"></div>
+            <div class="grid" id="08-27"></div>
+            <div class="grid" id="09-27"></div>
+            <div class="grid" id="10-27"></div>
+            <div class="grid" id="11-27"></div>
+            <div class="grid" id="12-27"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">28</div>
+            <div class="grid" id="01-28"></div>
+            <div class="grid" id="02-28"></div>
+            <div class="grid" id="03-28"></div>
+            <div class="grid" id="04-28"></div>
+            <div class="grid" id="05-28"></div>
+            <div class="grid" id="06-28"></div>
+            <div class="grid" id="07-28"></div>
+            <div class="grid" id="08-28"></div>
+            <div class="grid" id="09-28"></div>
+            <div class="grid" id="10-28"></div>
+            <div class="grid" id="11-28"></div>
+            <div class="grid" id="12-28"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">29</div>
+            <div class="grid" id="01-29"></div>
+
+            <!-- The 29th February is only displayed if it is a leap year -->
+            {% if IsLeapYear == True %}
+            <div class="grid" id="02-29"></div>
+            {% else %}
+            <div class="grid" style="background-color: #42436a;" id="02-29"></div>
+            {% endif %}
+
+            <div class="grid" id="03-29"></div>
+            <div class="grid" id="04-29"></div>
+            <div class="grid" id="05-29"></div>
+            <div class="grid" id="06-29"></div>
+            <div class="grid" id="07-29"></div>
+            <div class="grid" id="08-29"></div>
+            <div class="grid" id="09-29"></div>
+            <div class="grid" id="10-29"></div>
+            <div class="grid" id="11-29"></div>
+            <div class="grid" id="12-29"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">30</div>
+            <div class="grid" id="01-30"></div>
+            <div class="grid" style="background-color: #42436a;"></div>
+            <div class="grid" id="03-30"></div>
+            <div class="grid" id="04-30"></div>
+            <div class="grid" id="05-30"></div>
+            <div class="grid" id="06-30"></div>
+            <div class="grid" id="07-30"></div>
+            <div class="grid" id="08-30"></div>
+            <div class="grid" id="09-30"></div>
+            <div class="grid" id="10-30"></div>
+            <div class="grid" id="11-30"></div>
+            <div class="grid" id="12-30"></div>
+            <div class="grid" style="width: 30%; margin-left: 70%;">31</div>
+            <div class="grid" id="01-31"></div>
+            <div class="grid" style="background-color: #42436a;"></div>
+            <div class="grid" id="03-31"></div>
+            <div class="grid" style="background-color: #42436a;"></div>
+            <div class="grid" id="05-31"></div>
+            <div class="grid" style="background-color: #42436a;"></div>
+            <div class="grid" id="07-31"></div>
+            <div class="grid" id="08-31"></div>
+            <div class="grid" style="background-color: #42436a;"></div>
+            <div class="grid" id="10-31"></div>
+            <div class="grid" style="background-color: #42436a;"></div>
+            <div class="grid" id="12-31"></div>
+        </div>
+
+        <!-- The month calendar is displayed if the current view is month -->
+        {% elif View == 'Month' %}
+        <div class="month-calendar" id="month-calendar">
+            <div class="grid-month" style="align-items: center; justify-content: center; font-size: larger;">Mon</div>
+            <div class="grid-month" style="align-items: center; justify-content: center; font-size: larger;">Tue</div>
+            <div class="grid-month" style="align-items: center; justify-content: center; font-size: larger;">Wed</div>
+            <div class="grid-month" style="align-items: center; justify-content: center; font-size: larger;">Thu</div>
+            <div class="grid-month" style="align-items: center; justify-content: center; font-size: larger;">Fri</div>
+            <div class="grid-month" style="align-items: center; justify-content: center; font-size: larger;">Sat</div>
+            <div class="grid-month" style="align-items: center; justify-content: center; font-size: larger;">Sun</div>
+
+            <!-- Grey boxes are displayed up until the first day of the current month -->
+            {% for i in range(FirstDayIndex | int) %}
+            <div class = "grid-month" style="background-color: lightgrey;"></div>
+            {% endfor %}
+
+            <div class="grid-month" id="month-01">1</div>
+            <div class="grid-month" id="month-02">2</div>
+            <div class="grid-month" id="month-03">3</div>
+            <div class="grid-month" id="month-04">4</div>
+            <div class="grid-month" id="month-05">5</div>
+            <div class="grid-month" id="month-06">6</div>
+            <div class="grid-month" id="month-07">7</div>
+            <div class="grid-month" id="month-08">8</div>
+            <div class="grid-month" id="month-09">9</div>
+            <div class="grid-month" id="month-10">10</div>
+            <div class="grid-month" id="month-11">11</div>
+            <div class="grid-month" id="month-12">12</div>
+            <div class="grid-month" id="month-13">13</div>
+            <div class="grid-month" id="month-14">14</div>
+            <div class="grid-month" id="month-15">15</div>
+            <div class="grid-month" id="month-16">16</div>
+            <div class="grid-month" id="month-17">17</div>
+            <div class="grid-month" id="month-18">18</div>
+            <div class="grid-month" id="month-19">19</div>
+            <div class="grid-month" id="month-20">20</div>
+            <div class="grid-month" id="month-21">21</div>
+            <div class="grid-month" id="month-22">22</div>
+            <div class="grid-month" id="month-23">23</div>
+            <div class="grid-month" id="month-24">24</div>
+            <div class="grid-month" id="month-25">25</div>
+            <div class="grid-month" id="month-26">26</div>
+            <div class="grid-month" id="month-27">27</div>
+            <div class="grid-month" id="month-28">28</div>
+            {% if DaysInMonth | int == 31 %}
+            <div class="grid-month" id="month-29">29</div>
+            <div class="grid-month" id="month-30">30</div>
+            <div class="grid-month" id="month-31">31</div>
+            {% elif DaysInMonth | int == 30 %}
+            <div class="grid-month" id="month-29">29</div>
+            <div class="grid-month" id="month-30">30</div>
+            {% elif DaysInMonth | int == 29 %}
+            <div class="grid-month" id="month-29">29</div>
+            {% endif %}
+
+            <!-- After all days have been displayed, the rest of the calendar is filled with grey boxes -->
+            {% for i in range(42 - DaysInMonth | int - FirstDayIndex | int) %}
+            <div class = "grid-month" style="background-color: lightgrey;"></div>
+            {% endfor %}
+        </div>
+
+        <!-- The week calendar is displayed if the current view is week -->
+        {% else %}
+        <div class="week-calendar" id="week-calendar">
+            <div class="grid-week" style="background-color: #42436a; color: #E5EFC1;"></div>
+            <div class="grid-week" style="align-items: center; justify-content: center; height: 90%; margin-bottom: 20%; color: #42436a;">Monday {{ WeekToShow[0] }}</div>
+            <div class="grid-week" style="align-items: center; justify-content: center; height: 90%; margin-bottom: 20%; color: #42436a;">Tuesday {{ WeekToShow[1] }}</div>
+            <div class="grid-week" style="align-items: center; justify-content: center; height: 90%; margin-bottom: 20%; color: #42436a;">Wednesday {{ WeekToShow[2] }}</div>
+            <div class="grid-week" style="align-items: center; justify-content: center; height: 90%; margin-bottom: 20%; color: #42436a;">Thursday {{ WeekToShow[3] }}</div>
+            <div class="grid-week" style="align-items: center; justify-content: center; height: 90%; margin-bottom: 20%; color: #42436a;">Friday {{ WeekToShow[4] }}</div>
+            <div class="grid-week" style="align-items: center; justify-content: center; height: 90%; margin-bottom: 20%; color: #42436a;">Saturday {{ WeekToShow[5] }}</div>
+            <div class="grid-week" style="align-items: center; justify-content: center; height: 90%; margin-bottom: 20%; color: #42436a;">Sunday {{ WeekToShow[6] }}</div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">10:00</div>
+            <div class="grid-week" id="Monday-1000"></div>
+            <div class="grid-week" id="Tuesday-1000"></div>
+            <div class="grid-week" id="Wednesday-1000"></div>
+            <div class="grid-week" id="Thursday-1000"></div>
+            <div class="grid-week" id="Friday-1000"></div>
+            <div class="grid-week" id="Saturday-1000"></div>
+            <div class="grid-week" id="Sunday-1000"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1050"></div>
+            <div class="grid-week" id="Tuesday-1050"></div>
+            <div class="grid-week" id="Wednesday-1050"></div>
+            <div class="grid-week" id="Thursday-1050"></div>
+            <div class="grid-week" id="Friday-1050"></div>
+            <div class="grid-week" id="Saturday-1050"></div>
+            <div class="grid-week" id="Sunday-1050"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">11:00</div>
+            <div class="grid-week" id="Monday-1100"></div>
+            <div class="grid-week" id="Tuesday-1100"></div>
+            <div class="grid-week" id="Wednesday-1100"></div>
+            <div class="grid-week" id="Thursday-1100"></div>
+            <div class="grid-week" id="Friday-1100"></div>
+            <div class="grid-week" id="Saturday-1100"></div>
+            <div class="grid-week" id="Sunday-1100"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1150"></div>
+            <div class="grid-week" id="Tuesday-1150"></div>
+            <div class="grid-week" id="Wednesday-1150"></div>
+            <div class="grid-week" id="Thursday-1150"></div>
+            <div class="grid-week" id="Friday-1150"></div>
+            <div class="grid-week" id="Saturday-1150"></div>
+            <div class="grid-week" id="Sunday-1150"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">12:00</div>
+            <div class="grid-week" id="Monday-1200"></div>
+            <div class="grid-week" id="Tuesday-1200"></div>
+            <div class="grid-week" id="Wednesday-1200"></div>
+            <div class="grid-week" id="Thursday-1200"></div>
+            <div class="grid-week" id="Friday-1200"></div>
+            <div class="grid-week" id="Saturday-1200"></div>
+            <div class="grid-week" id="Sunday-1200"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1250"></div>
+            <div class="grid-week" id="Tuesday-1250"></div>
+            <div class="grid-week" id="Wednesday-1250"></div>
+            <div class="grid-week" id="Thursday-1250"></div>
+            <div class="grid-week" id="Friday-1250"></div>
+            <div class="grid-week" id="Saturday-1250"></div>
+            <div class="grid-week" id="Sunday-1250"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">13:00</div>
+            <div class="grid-week" id="Monday-1300"></div>
+            <div class="grid-week" id="Tuesday-1300"></div>
+            <div class="grid-week" id="Wednesday-1300"></div>
+            <div class="grid-week" id="Thursday-1300"></div>
+            <div class="grid-week" id="Friday-1300"></div>
+            <div class="grid-week" id="Saturday-1300"></div>
+            <div class="grid-week" id="Sunday-1300"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1350"></div>
+            <div class="grid-week" id="Tuesday-1350"></div>
+            <div class="grid-week" id="Wednesday-1350"></div>
+            <div class="grid-week" id="Thursday-1350"></div>
+            <div class="grid-week" id="Friday-1350"></div>
+            <div class="grid-week" id="Saturday-1350"></div>
+            <div class="grid-week" id="Sunday-1350"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">14:00</div>
+            <div class="grid-week" id="Monday-1400"></div>
+            <div class="grid-week" id="Tuesday-1400"></div>
+            <div class="grid-week" id="Wednesday-1400"></div>
+            <div class="grid-week" id="Thursday-1400"></div>
+            <div class="grid-week" id="Friday-1400"></div>
+            <div class="grid-week" id="Saturday-1400"></div>
+            <div class="grid-week" id="Sunday-1400"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1450"></div>
+            <div class="grid-week" id="Tuesday-1450"></div>
+            <div class="grid-week" id="Wednesday-1450"></div>
+            <div class="grid-week" id="Thursday-1450"></div>
+            <div class="grid-week" id="Friday-1450"></div>
+            <div class="grid-week" id="Saturday-1450"></div>
+            <div class="grid-week" id="Sunday-1450"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">15:00</div>
+            <div class="grid-week" id="Monday-1500"></div>
+            <div class="grid-week" id="Tuesday-1500"></div>
+            <div class="grid-week" id="Wednesday-1500"></div>
+            <div class="grid-week" id="Thursday-1500"></div>
+            <div class="grid-week" id="Friday-1500"></div>
+            <div class="grid-week" id="Saturday-1500"></div>
+            <div class="grid-week" id="Sunday-1500"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1550"></div>
+            <div class="grid-week" id="Tuesday-1550"></div>
+            <div class="grid-week" id="Wednesday-1550"></div>
+            <div class="grid-week" id="Thursday-1550"></div>
+            <div class="grid-week" id="Friday-1550"></div>
+            <div class="grid-week" id="Saturday-1550"></div>
+            <div class="grid-week" id="Sunday-1550"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">16:00</div>
+            <div class="grid-week" id="Monday-1600"></div>
+            <div class="grid-week" id="Tuesday-1600"></div>
+            <div class="grid-week" id="Wednesday-1600"></div>
+            <div class="grid-week" id="Thursday-1600"></div>
+            <div class="grid-week" id="Friday-1600"></div>
+            <div class="grid-week" id="Saturday-1600"></div>
+            <div class="grid-week" id="Sunday-1600"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1650"></div>
+            <div class="grid-week" id="Tuesday-1650"></div>
+            <div class="grid-week" id="Wednesday-1650"></div>
+            <div class="grid-week" id="Thursday-1650"></div>
+            <div class="grid-week" id="Friday-1650"></div>
+            <div class="grid-week" id="Saturday-1650"></div>
+            <div class="grid-week" id="Sunday-1650"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">17:00</div>
+            <div class="grid-week" id="Monday-1700"></div>
+            <div class="grid-week" id="Tuesday-1700"></div>
+            <div class="grid-week" id="Wednesday-1700"></div>
+            <div class="grid-week" id="Thursday-1700"></div>
+            <div class="grid-week" id="Friday-1700"></div>
+            <div class="grid-week" id="Saturday-1700"></div>
+            <div class="grid-week" id="Sunday-1700"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1750"></div>
+            <div class="grid-week" id="Tuesday-1750"></div>
+            <div class="grid-week" id="Wednesday-1750"></div>
+            <div class="grid-week" id="Thursday-1750"></div>
+            <div class="grid-week" id="Friday-1750"></div>
+            <div class="grid-week" id="Saturday-1750"></div>
+            <div class="grid-week" id="Sunday-1750"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">18:00</div>
+            <div class="grid-week" id="Monday-1800"></div>
+            <div class="grid-week" id="Tuesday-1800"></div>
+            <div class="grid-week" id="Wednesday-1800"></div>
+            <div class="grid-week" id="Thursday-1800"></div>
+            <div class="grid-week" id="Friday-1800"></div>
+            <div class="grid-week" id="Saturday-1800"></div>
+            <div class="grid-week" id="Sunday-1800"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1850"></div>
+            <div class="grid-week" id="Tuesday-1850"></div>
+            <div class="grid-week" id="Wednesday-1850"></div>
+            <div class="grid-week" id="Thursday-1850"></div>
+            <div class="grid-week" id="Friday-1850"></div>
+            <div class="grid-week" id="Saturday-1850"></div>
+            <div class="grid-week" id="Sunday-1850"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">19:00</div>
+            <div class="grid-week" id="Monday-1900"></div>
+            <div class="grid-week" id="Tuesday-1900"></div>
+            <div class="grid-week" id="Wednesday-1900"></div>
+            <div class="grid-week" id="Thursday-1900"></div>
+            <div class="grid-week" id="Friday-1900"></div>
+            <div class="grid-week" id="Saturday-1900"></div>
+            <div class="grid-week" id="Sunday-1900"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-1950"></div>
+            <div class="grid-week" id="Tuesday-1950"></div>
+            <div class="grid-week" id="Wednesday-1950"></div>
+            <div class="grid-week" id="Thursday-1950"></div>
+            <div class="grid-week" id="Friday-1950"></div>
+            <div class="grid-week" id="Saturday-1950"></div>
+            <div class="grid-week" id="Sunday-1950"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">20:00</div>
+            <div class="grid-week" id="Monday-2000"></div>
+            <div class="grid-week" id="Tuesday-2000"></div>
+            <div class="grid-week" id="Wednesday-2000"></div>
+            <div class="grid-week" id="Thursday-2000"></div>
+            <div class="grid-week" id="Friday-2000"></div>
+            <div class="grid-week" id="Saturday-2000"></div>
+            <div class="grid-week" id="Sunday-2000"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-2050"></div>
+            <div class="grid-week" id="Tuesday-2050"></div>
+            <div class="grid-week" id="Wednesday-2050"></div>
+            <div class="grid-week" id="Thursday-2050"></div>
+            <div class="grid-week" id="Friday-2050"></div>
+            <div class="grid-week" id="Saturday-2050"></div>
+            <div class="grid-week" id="Sunday-2050"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">21:00</div>
+            <div class="grid-week" id="Monday-2100"></div>
+            <div class="grid-week" id="Tuesday-2100"></div>
+            <div class="grid-week" id="Wednesday-2100"></div>
+            <div class="grid-week" id="Thursday-2100"></div>
+            <div class="grid-week" id="Friday-2100"></div>
+            <div class="grid-week" id="Saturday-2100"></div>
+            <div class="grid-week" id="Sunday-2100"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-2150"></div>
+            <div class="grid-week" id="Tuesday-2150"></div>
+            <div class="grid-week" id="Wednesday-2150"></div>
+            <div class="grid-week" id="Thursday-2150"></div>
+            <div class="grid-week" id="Friday-2150"></div>
+            <div class="grid-week" id="Saturday-2150"></div>
+            <div class="grid-week" id="Sunday-2150"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">22:00</div>
+            <div class="grid-week" id="Monday-2200"></div>
+            <div class="grid-week" id="Tuesday-2200"></div>
+            <div class="grid-week" id="Wednesday-2200"></div>
+            <div class="grid-week" id="Thursday-2200"></div>
+            <div class="grid-week" id="Friday-2200"></div>
+            <div class="grid-week" id="Saturday-2200"></div>
+            <div class="grid-week" id="Sunday-2200"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-2250"></div>
+            <div class="grid-week" id="Tuesday-2250"></div>
+            <div class="grid-week" id="Wednesday-2250"></div>
+            <div class="grid-week" id="Thursday-2250"></div>
+            <div class="grid-week" id="Friday-2250"></div>
+            <div class="grid-week" id="Saturday-2250"></div>
+            <div class="grid-week" id="Sunday-2250"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">23:00</div>
+            <div class="grid-week" id="Monday-2300"></div>
+            <div class="grid-week" id="Tuesday-2300"></div>
+            <div class="grid-week" id="Wednesday-2300"></div>
+            <div class="grid-week" id="Thursday-2300"></div>
+            <div class="grid-week" id="Friday-2300"></div>
+            <div class="grid-week" id="Saturday-2300"></div>
+            <div class="grid-week" id="Sunday-2300"></div>
+            <div class="grid-week" style="background-color: #42436a;"></div>
+            <div class="grid-week" id="Monday-2350"></div>
+            <div class="grid-week" id="Tuesday-2350"></div>
+            <div class="grid-week" id="Wednesday-2350"></div>
+            <div class="grid-week" id="Thursday-2350"></div>
+            <div class="grid-week" id="Friday-2350"></div>
+            <div class="grid-week" id="Saturday-2350"></div>
+            <div class="grid-week" id="Sunday-2350"></div>
+            <div class="grid-week" style="margin-top: -8%; background-color: #42436a; color: #E5EFC1; width: 40%; margin-left: 60%; font-weight: 400; font-size: larger;">00:00</div>
+        </div>
+        {% endif %}
+    </div>
+
+        <!-- The details menu -->
+    <div class="details-menu" id="details-menu">
+        <h1 style="color: #f64668; cursor: pointer; margin-left: auto;" onclick="closeMenu()">x</h1>
+        <h3 id="names" style="margin-top: -7%;"></h3>
+        <h3 id="date"></h3>
+        <h3 id="times"></h3>
+        <h3 id="event"></h3>
+        <h3 id="package"></h3>
+        <h3 id="set-up"></h3>
+        <h3 id="ceremony"></h3>
+        <h3 id="ceremony-time"></h3>
+        <h3 id="adult-guests"></h3>
+        <h3 id="child-guests"></h3>
+        <h3 id="below2-guests"></h3>
+        <h3 id="welcome-drinks"></h3>
+        <h3 id="adult-drink"></h3>
+        <h3 id="child-drink"></h3>
+        <h3 id="toasts"></h3>
+        <h3 id="notes" style="text-align: left; background-color: #E5EFC1; color: #42436a; border-radius: 4px; width: 100%; border: none; font-size: larger; font-weight: 800; margin-bottom: 3%;"></h3>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+</div>
+<script>
+    function closeMenu() {
+        // The details menu is no longer displayed and the background is no longer blurred
+        let detailsMenu = document.getElementById('details-menu');
+        detailsMenu.style.display = 'none';
+
+        let overlay = document.getElementById('overlay');
+        overlay.style.display = 'none';
+    }
+
+    function yearDates() {
+
+        // For each booking in the bookings to display array:
+        for (let i=0; i < bookingsToDisplay.length; i++) {
+
+            // The day and month of the booking is retrieved
+            let bookingDate = bookingsToDisplay[i][25].substring(5, 10);
+
+            // The correct box of the calendar is retrieved using the date of the booking
+            let bookingBox = document.getElementById(bookingDate);
+            
+            // If the booking is a genuine booking and not an unavailable date, the colour of the box is changed to red
+            // It is also given the property to be clicked to display the event details menu
+            if (bookingsToDisplay[i][24] === false) {
+                bookingBox.style.backgroundColor = '#f64668';
+                bookingBox.style.cursor = 'pointer';
+                bookingBox.setAttribute('onclick', `showBookingDetails(${bookingsToDisplay[i][0]})`);
+            
+            // If the booking is just an unavailable date, the box colour is changed to yellow
+            } else {
+                bookingBox.style.backgroundColor = 'yellow';
+            }
+        }
+    }
+
+    function monthDates() {
+        
+        // For each booking in the array:
+        for (let i=0; i < bookingsToDisplay.length; i++) {
+
+            // The day of the booking is retrieved and the calendar box representing this day is retrieved
+            let bookingDate = bookingsToDisplay[i][25].substring(8, 10);
+            let bookingBox = document.getElementById(`month-${bookingDate}`);
+
+            // If the booking is a genuine booking, the colour of the box is changed to red,
+            // Some event details are displayed,
+            // The box now has the property to be clicked and display the event detail menu
+            if (bookingsToDisplay[i][24] === false) {
+                bookingBox.style.color = '#efe5c1';
+                bookingBox.style.backgroundColor = '#f64668';
+                bookingBox.style.cursor = 'pointer';
+                bookingBox.setAttribute('onclick', `showBookingDetails(${bookingsToDisplay[i][0]})`);
+
+                // The second customer name is only displayed if there are 2 customers for the event
+                if (bookingsToDisplay[i][2] === 'null') {
+                    bookingBox.innerText = `${bookingsToDisplay[i][25].substring(8, 10)} - ${bookingsToDisplay[i][4]}\n${bookingsToDisplay[i][7]} - ${bookingsToDisplay[i][8]}\n${bookingsToDisplay[i][1]}`;
+                } else {
+                    bookingBox.innerText = `${bookingsToDisplay[i][25].substring(8, 10)} - ${bookingsToDisplay[i][4]}\n${bookingsToDisplay[i][7]} - ${bookingsToDisplay[i][8]}\n${bookingsToDisplay[i][1]}\n& ${bookingsToDisplay[i][2]}`;
+                }
+
+            // If the event is just an unavailable date, the box is changed to yellow and it is labelled as an unavailable date
+            } else {
+                bookingBox.style.backgroundColor = 'yellow';
+                bookingBox.innerText = `${bookingsToDisplay[i][25].substring(8, 10)} - Unavailable date`;
+            }
+        }
+    }
+
+    function weekDates() {
+
+        // For each booking in the array:
+        for (let i=0; i < bookingsToDisplay.length; i++) {
+
+            // The day of the week of that booking is retrieved and so is the start and end time of the booking
+            let bookingDayOfWeek = bookingsToDisplay[i][5];
+            let startTime = bookingsToDisplay[i][7];
+            let endTime = bookingsToDisplay[i][8];
+
+            // The start and end time are changed from the format HH:MM to HHMM so tha=ey can be treated as numbers
+            startTime = String(startTime).replace(/:/g, '');
+
+            // If the end time is midnight, this is converted.
+            // This is necessary for subsequent calculations
+            if (endTime === '00:00') {
+                endTime = '24:00';
+            }
+
+            // If the end time is 30 minutes past the hour, the 30 is changed to 50.
+            // This is also necessary for subsequent calculations
+            if (startTime[2] === '3') {
+                startTime = startTime.substring(0, 2) + '5' + startTime.substring(3);
+            }
+
+            // Start and end times converted to numbers
+            startTime = Number(startTime);
+            endTime = Number(String(endTime).replace(/:/g, ''));
+
+
+            // If the booking is a genuine booking:
+            if (bookingsToDisplay[i][24] === false) {
+                
+                for (let j=startTime; j < endTime; j += 50) {
+
+                    // Starting at the start time, the calendar box of the time is retrieved and changed to red
+                    bookingBox = document.getElementById(`${bookingDayOfWeek}-${j}`);
+                    bookingBox.style.backgroundColor = '#f64668';
+
+                    // The height of the box is slightly adjusted so that it appears as a single block
+                    bookingBox.style.height = '107%';
+
+                    // The box can now be clicked to display the event details menu
+                    bookingBox.style.cursor = 'pointer';
+                    bookingBox.setAttribute('onclick', `showBookingDetails(${bookingsToDisplay[i][0]})`);
+
+                    // In the first box, the type of event is displayed
+                    if (j === startTime) {
+                        bookingBox.innerText = bookingsToDisplay[i][4];
+
+                    // If there is a second box, the start and end times are displayed
+                    } else if (j === startTime + 50) {
+                        bookingBox.innerText = `${bookingsToDisplay[i][7]} - ${bookingsToDisplay[i][8]}`
+
+                    // If there is a third box, the customer name/names are displayed
+                    } else if (j === startTime + 100) {
+                        bookingBox.innerText = bookingsToDisplay[i][1];
+                    } else if (j === startTime + 150) {
+                        if (bookingsToDisplay[i][2] === 'null') {
+                            bookingBox.innerText = bookingsToDisplay[i][5];
+                        } else {
+                            bookingBox.innerText = `& ${bookingsToDisplay[i][2]}`;
+                        }
+                    }
+
+                    // This way of displaying event details means that some details are only displayed if the whole box representing the booking on the calendar is big enough
+                }
+
+            // If the booking is just an unavailable date
+            } else {
+
+                // All boxes on the day are changed to yellow to show that the whole day is unavailable
+                // The box is labelled as an unavailable date
+                for (let i=1000; i <= 2350; i += 50) {
+                    let unavailableDateBox = document.getElementById(`${bookingDayOfWeek}-${i}`);
+                    unavailableDateBox.style.backgroundColor = 'yellow';
+                    unavailableDateBox.style.color = '#42436a';
+                    unavailableDateBox.style.height = '107%';
+                    if (i === 1000) {
+                        unavailableDateBox.innerText = 'Unavailable date';
+                    }
+                }
+            }
+        }
+    }
+
+    function showBookingDetails(bookingToDisplay) {
+
+        // The index of the booking that is being displayed is retrieved from the array
+        // The booking id cannot be used here as the booking id and index may not be the same so the wrong data could be retrieved
+        let index = getIndex(bookingsToDisplay, bookingToDisplay);
+
+        // The details menu is displayed
+        let detailMenu = document.getElementById('details-menu');
+        detailMenu.style.display = 'flex';
+
+        // The background is blurred
+        let overlay = document.getElementById('overlay');
+        overlay.style.display = 'flex';
+
+        // The event details are added to the details menu:
+
+        let names = document.getElementById('names');
+        if (bookingsToDisplay[index][2] !== 'null') {
+            names.innerText = `${bookingsToDisplay[index][1]} & ${bookingsToDisplay[index][2]}`;
+        } else {
+            names.innerText = `${bookingsToDisplay[index][1]}`;
+        }
+
+        let date = document.getElementById('date');
+        date.innerText = `${bookingsToDisplay[index][5]} ${bookingsToDisplay[index][6]}`;
+
+        let times = document.getElementById('times');
+        times.innerText = `${bookingsToDisplay[index][7]} - ${bookingsToDisplay[index][8]}`;
+
+        let event = document.getElementById('event');
+        event.innerText = `${bookingsToDisplay[index][4]}`;
+
+        let package = document.getElementById('package');
+        if (event.innerText === 'Wedding') {
+            package.style.display = 'flex';
+            package.innerText = `Package - ${bookingsToDisplay[index][26]}`;
+        } else {
+            package.style.display = 'none';
+        }
+
+        let setUpRequired = document.getElementById('set-up');
+        if (bookingsToDisplay[index][21]) {
+            setUpRequired.innerText = `Set up required - Yes`;
+        } else {
+            setUpRequired.innerText = `Set up required - No`;
+        }
+
+        let ceremonyRequired = document.getElementById('ceremony');
+        let ceremonyTime = document.getElementById('ceremony-time');
+        if (bookingsToDisplay[index][16]) {
+            ceremonyRequired.innerText = `Ceremony required - Yes`;
+            ceremonyTime.style.display = 'flex';
+            ceremonyTime.innerText = `Ceremony time - ${bookingsToDisplay[index][17]}`;
+        } else {
+            ceremonyRequired.innerText = `Ceremony required - No`;
+            ceremonyTime.style.display = 'none';
+        }
+
+        let adultNumber = document.getElementById('adult-guests');
+        adultNumber.innerText = `Adult guests - ${bookingsToDisplay[index][9]}`;
+
+        let childNumber = document.getElementById('child-guests');
+        childNumber.innerText = `Child guests - ${bookingsToDisplay[index][10]}`;
+
+        let below2Number = document.getElementById('below2-guests');
+        below2Number.innerText = `Below 2 guests - ${bookingsToDisplay[index][11]}`;
+
+        let welcomeDrinksRequired = document.getElementById('welcome-drinks');
+        let adultDrink = document.getElementById('adult-drink');
+        let childDrink = document.getElementById('child-drink');
+        if (bookingsToDisplay[index][18]) {
+            welcomeDrinksRequired.innerText = `Welcome drinks required - Yes`;
+
+            adultDrink.style.display = 'flex';
+            childDrink.style.display = 'flex';
+
+            adultDrink.innerText = `Adult drink - ${bookingsToDisplay[index][19]}`;
+            childDrink.innerText = `Child Drink - ${bookingsToDisplay[index][20]}`;
+        } else {
+            welcomeDrinksRequired.innerText = `Welcome drinks required - No`;
+            adultDrink.style.display = 'none';
+            childDrink.style.display = 'none';
+        }
+
+        let toastsRequired = document.getElementById('toasts');
+        if (bookingsToDisplay[index][15]) {
+            toastsRequired.innerText = `Champagne for toasts required - Yes`;
+        } else {
+            toastsRequired.innerText = `Champagne for toasts required - No`;
+        }
+
+        let notes = document.getElementById('notes');
+        notes.innerText = `Notes - ${bookingsToDisplay[index][22]}`;
+    }
+   
+    function getIndex(array, bookingID) {
+
+        // A linear search is used to find the index of a booking in the array
+        for (let i = 0; i < array.length; i++) {
+
+            // Each element is searched until the correct element is found
+            if (array[i][0] === bookingID) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // The bookings to display array is retrieved from the backend
+    let bookingsToDisplay = {{ BookingsToDisplay | safe }};
+
+    // A function is called depending on the current view to display the bookings
+    if ("{{ View }}" === 'Year') {
+        yearDates();
+    } else if ("{{ View }}" === 'Month') {
+        monthDates();
+    } else {
+        weekDates();
+    }
+</script>
+{% endblock %}

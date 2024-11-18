@@ -1,0 +1,52 @@
+{% extends "BaseNewBookingBanner.html" %}
+{% block contents %}
+<style>
+    .container {
+        margin-top: 10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Tahoma;
+        color: #E5EFC1;
+        width: 100%;
+    }
+    .customer {
+        background-color: #f64668;
+        color: #E5EFC1;
+        font-family: Tahoma;
+        width: 90%;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-evenly;
+        padding: 1% 3%;
+        margin-left: 5%;
+        border: none;
+        margin-bottom: 2%;
+    }
+    .customer:hover {
+        border: 2px solid #E5EFC1;
+    }
+    @media (max-width: 800px) {
+        .container {
+            margin-top: 20%;
+        }
+    }
+</style>
+<div class = "container">
+
+    <h1 style="text-align: center;">Who is this event for?</h1>
+
+    <form method = 'post' style="width: 100%;">
+
+        <!-- The customer first names and surnames are displayed -->
+        {% for customer in CustomerInformation %}
+        <button name="customer" type="submit" class="customer" value={{ customer[2][0] }}>
+            <h3>{{ customer[0][0] }} {{ customer[1][0] }}</h3>
+        </button>
+        {% endfor %}
+    </form>
+</div>
+{% endblock %}
